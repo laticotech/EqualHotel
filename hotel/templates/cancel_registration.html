@@ -1,0 +1,81 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}Cancel Registration - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>CANCEL REGISTRATION</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Cancel Registration -->
+<div class="cancel-registration-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card border-danger shadow-sm">
+                    <div class="card-header bg-danger text-white py-3">
+                        <h4 class="card-title mb-0 text-center">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Cancel Registration
+                        </h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-times-circle fa-4x text-danger mb-3"></i>
+                            <h4 class="text-danger">Confirm Cancellation</h4>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">Registration Details:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Event:</strong> {{ registration.event.title }}</li>
+                                <li><strong>Date:</strong> {{ registration.event.start_date|date:"F d, Y" }}</li>
+                                <li><strong>Time:</strong> {{ registration.event.start_date|date:"H:i" }}</li>
+                                <li><strong>Location:</strong> {{ registration.event.location }}</li>
+                                <li><strong>Attendees:</strong> {{ registration.number_of_guests }}</li>
+                            </ul>
+                        </div>
+
+                        <div class="alert alert-danger">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-exclamation-circle me-2"></i>Important Notice
+                            </h6>
+                            <p class="mb-0">This action cannot be undone. Your registration will be cancelled immediately.</p>
+                        </div>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                <button type="submit" class="btn btn-danger me-md-2">
+                                    <i class="fas fa-times me-2"></i>Yes, Cancel Registration
+                                </button>
+                                <a href="{% url 'my_event_registrations' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Go Back
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Cancel Registration -->
+
+<style>
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+</style>
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}

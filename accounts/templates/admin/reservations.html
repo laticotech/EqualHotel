@@ -1,0 +1,203 @@
+{% extends 'admin/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Manage Service Reservations - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Service Reservations</h1>
+        <div class="d-none d-sm-inline-block">
+            <span class="badge bg-success">{{ reservations.paginator.count }} total reservations</span>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-success">Filters</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">All Statuses</option>
+                        {% for status_code, status_name in status_choices %}
+                        <option value="{{ status_code }}" {% if status_filter == status_code %}selected{% endif %}>
+                            {{ status_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">&nbsp;</label>
+                    <div>
+                        <button type="submit" class="btn btn-success">Apply Filters</button>
+                        <a href="{% url 'admin_reservations' %}" class="btn btn-secondary">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reservations Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-success">All Reservations</h6>
+        </div>
+        <div class="card-body">
+            {% if reservations %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Reservation #</th>
+                            <th>Guest</th>
+                            <th>Service</th>
+                            <th>Date & Time</th>
+                            <th>Guests</th>
+                            <th>Amount</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reservation in reservations %}
+                        <tr>
+                            <td>
+                                <strong>{{ reservation.reservation_number }}</strong>
+                            </td>
+                            <td>
+                                <div class="fw-bold">{{ reservation.guest_name }}</div>
+                                <small class="text-muted">{{ reservation.guest_email }}</small>
+                            </td>
+                            <td>
+                                <div class="fw-bold">{{ reservation.service.name }}</div>
+                                <small class="text-muted">{{ reservation.service.get_category_display }}</small>
+                            </td>
+                            <td>
+                                <div class="fw-bold">{{ reservation.reservation_date }}</div>
+                                <small class="text-muted">{{ reservation.reservation_time|time:"H:i" }}</small>
+                            </td>
+                            <td class="text-center">{{ reservation.number_of_guests }}</td>
+                            <td class="fw-bold {% if reservation.total_amount > 0 %}text-success{% else %}text-muted{% endif %}">
+                                {% if reservation.total_amount > 0 %}
+                                GHS {{ reservation.total_amount }}
+                                {% else %}
+                                FREE
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if reservation.payment_status == 'pending' and reservation.total_amount > 0 %}
+                                <!-- Receive Payments Button for pending payments with amount due -->
+                                <a href="{% url 'receive_service_payment' reservation.reservation_number %}"
+                                   class="btn btn-success btn-sm w-100"
+                                   style="font-size: 0.8rem; padding: 0.25rem 0.5rem;">
+                                    <i class="fas fa-money-bill me-1"></i>
+                                    Receive Payment
+                                </a>
+                                {% elif reservation.payment_status == 'pending' and reservation.total_amount == 0 %}
+                                <!-- Confirm button for free services -->
+                                <a href="{% url 'admin_reservation_detail' reservation.id %}"
+                                   class="btn btn-info btn-sm w-100"
+                                   style="font-size: 0.8rem; padding: 0.25rem 0.5rem;">
+                                    <i class="fas fa-check me-1"></i>
+                                    Confirm
+                                </a>
+                                {% else %}
+                                <!-- Payment status badge for other cases -->
+                                <span class="badge bg-{% if reservation.payment_status == 'completed' %}success{% elif reservation.payment_status == 'no_payment_required' %}info{% else %}secondary{% endif %}">
+                                    {{ reservation.payment_status|title }}
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if reservation.status == 'confirmed' %}success{% elif reservation.status == 'pending' %}warning{% elif reservation.status == 'cancelled' %}danger{% else %}secondary{% endif %}">
+                                    {{ reservation.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ reservation.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'admin_reservation_detail' reservation.id %}" class="btn btn-success">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <!-- Additional payment button in actions for quick access -->
+                                    {% if reservation.payment_status == 'pending' and reservation.total_amount > 0 %}
+                                    <a href="{% url 'receive_service_payment' reservation.reservation_number %}" class="btn btn-primary" title="Receive Payment">
+                                        <i class="fas fa-money-bill"></i>
+                                    </a>
+                                    {% elif reservation.payment_status == 'pending' and reservation.total_amount == 0 %}
+                                    <a href="{% url 'admin_reservation_detail' reservation.id %}" class="btn btn-info" title="Confirm Reservation">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if reservations.has_other_pages %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if reservations.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ reservations.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in reservations.paginator.page_range %}
+                    <li class="page-item {% if reservations.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if status_filter %}&status={{ status_filter }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if reservations.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ reservations.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-concierge-bell fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Reservations Found</h4>
+                <p class="text-muted">No service reservations match your current filters.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+/* Optional: Add some hover effects for better UX */
+.btn-success:hover, .btn-primary:hover, .btn-info:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Specific hover colors */
+.btn-success:hover {
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.btn-info:hover {
+    box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3);
+}
+</style>
+{% endblock %}

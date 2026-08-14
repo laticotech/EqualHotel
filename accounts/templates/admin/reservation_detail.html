@@ -1,0 +1,194 @@
+{% extends 'admin/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Reservation Details - {{ reservation.reservation_number }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Reservation Details</h1>
+        <div class="d-none d-sm-inline-block">
+            <a href="{% url 'admin_reservations' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to Reservations
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Reservation Information -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-success">Reservation Information</h6>
+                    <span class="badge bg-{% if reservation.status == 'confirmed' %}success{% elif reservation.status == 'pending' %}warning{% elif reservation.status == 'cancelled' %}danger{% else %}secondary{% endif %}">
+                        {{ reservation.get_status_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Reservation Number</h6>
+                            <p>{{ reservation.reservation_number }}</p>
+
+                            <h6 class="fw-bold">Service Details</h6>
+                            <p class="mb-1 fw-bold">{{ reservation.service.name }}</p>
+                            <p class="mb-1 text-muted">{{ reservation.service.get_category_display }}</p>
+                            {% if reservation.service.description %}
+                            <p class="small text-muted">{{ reservation.service.description|truncatewords:20 }}</p>
+                            {% endif %}
+
+                            <h6 class="fw-bold mt-3">Date & Time</h6>
+                            <p class="mb-1">{{ reservation.reservation_date }}</p>
+                            <p class="mb-1">{{ reservation.reservation_time|time:"H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Guest Information</h6>
+                            <p class="mb-1">{{ reservation.guest_name }}</p>
+                            <p class="mb-1">{{ reservation.guest_email }}</p>
+                            <p class="mb-1">{{ reservation.guest_phone }}</p>
+
+                            <h6 class="fw-bold mt-3">Reservation Details</h6>
+                            <p class="mb-1">{{ reservation.number_of_guests }} guest{{ reservation.number_of_guests|pluralize }}</p>
+                            <p class="fw-bold {% if reservation.total_amount > 0 %}text-success{% else %}text-muted{% endif %}">
+                                Total Amount: 
+                                {% if reservation.total_amount > 0 %}
+                                GHS {{ reservation.total_amount }}
+                                {% else %}
+                                FREE
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    {% if reservation.special_requests %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6 class="fw-bold">Special Requests</h6>
+                            <div class="alert alert-info">
+                                {{ reservation.special_requests }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Payment Information -->
+            {% if reservation.requires_payment %}
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">Payment Information</h6>
+                </div>
+                <div class="card-body">
+                    {% if reservation.payment %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Expected Amount:</strong> GHS {{ reservation.total_amount }}</p>
+                            <p><strong>Amount Paid:</strong> GHS {{ reservation.payment.amount_paid }}</p>
+                            <p><strong>Balance Due:</strong> GHS {{ reservation.payment.balance_due }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Payment Method:</strong> {{ reservation.payment.get_payment_method_display }}</p>
+                            <p><strong>Payment Status:</strong> 
+                                <span class="badge bg-{% if reservation.payment.payment_status == 'completed' %}success{% elif reservation.payment.payment_status == 'pending' %}warning{% else %}danger{% endif %}">
+                                    {{ reservation.payment.get_payment_status_display }}
+                                </span>
+                            </p>
+                            <p><strong>Payment Date:</strong> {{ reservation.payment.payment_date|date:"M d, Y H:i" }}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        No payment record found for this reservation. Expected amount: GHS {{ reservation.total_amount }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Actions Sidebar -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Status Update -->
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Update Status</label>
+                            <select name="status" id="status" class="form-select">
+                                {% for status_code, status_name in reservation.STATUS_CHOICES %}
+                                <option value="{{ status_code }}" {% if reservation.status == status_code %}selected{% endif %}>
+                                    {{ status_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 mb-3">Update Status</button>
+
+                        <!-- Mark as Paid -->
+                        {% if reservation.requires_payment %}
+                        <button type="submit" name="mark_paid" class="btn btn-primary w-100">
+                            <i class="fas fa-check me-1"></i> Mark as Paid
+                        </button>
+                        {% endif %}
+                    </form>
+
+                    <!-- Timeline -->
+                    <hr class="my-4">
+                    <h6 class="fw-bold">Timeline</h6>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <small class="text-muted">Created</small>
+                            <p class="mb-0">{{ reservation.created_at|date:"M d, Y H:i" }}</p>
+                        </div>
+                        <div class="timeline-item">
+                            <small class="text-muted">Last Updated</small>
+                            <p class="mb-0">{{ reservation.updated_at|date:"M d, Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Information -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">Service Information</h6>
+                </div>
+                <div class="card-body">
+                    <h6 class="fw-bold">{{ reservation.service.name }}</h6>
+                    <p class="small text-muted mb-2">{{ reservation.service.get_category_display }}</p>
+                    
+                    {% if reservation.service.available_days %}
+                    <p class="small mb-1"><strong>Available:</strong> {{ reservation.service.available_days }}</p>
+                    {% endif %}
+                    
+                    {% if reservation.service.available_times %}
+                    <p class="small mb-1"><strong>Hours:</strong> {{ reservation.service.available_times }}</p>
+                    {% endif %}
+                    
+                    <p class="small mb-1">
+                        <strong>Booking Required:</strong> 
+                        {% if reservation.service.requires_booking %}Yes{% else %}No{% endif %}
+                    </p>
+                    
+                    <p class="small mb-0">
+                        <strong>Status:</strong> 
+                        {% if reservation.service.is_active %}
+                        <span class="text-success">Active</span>
+                        {% else %}
+                        <span class="text-danger">Inactive</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

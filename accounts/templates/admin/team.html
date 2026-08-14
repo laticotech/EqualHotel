@@ -1,0 +1,139 @@
+{% extends 'admin/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Team Management - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Team Management</h1>
+        <div class="d-none d-sm-inline-block">
+            <a href="{% url 'admin_team_create' %}" class="btn btn-success">
+                <i class="fas fa-user-plus me-1"></i> Add Member
+            </a>
+        </div>
+    </div>
+
+    <!-- Team Members -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-success">Team Members</h6>
+            <span class="badge bg-success">{{ team_members|length }} members</span>
+        </div>
+        <div class="card-body">
+            {% if team_members %}
+            <div class="row">
+                {% for member in team_members %}
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card border-left-{% if member.is_active %}success{% else %}secondary{% endif %} shadow h-100">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="d-flex align-items-center mb-3">
+                                        {% if member.photo %}
+                                        <img src="{{ member.photo.url }}" class="rounded-circle me-3" 
+                                             alt="{{ member.name }}" style="width: 60px; height: 60px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3" 
+                                             style="width: 60px; height: 60px;">
+                                            <i class="fas fa-user text-white fa-lg"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ member.name }}</div>
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                {{ member.position }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="small text-muted mb-2">
+                                        {% if member.email %}
+                                        <i class="fas fa-envelope me-1"></i> {{ member.email }}<br>
+                                        {% endif %}
+                                        {% if member.phone %}
+                                        <i class="fas fa-phone me-1"></i> {{ member.phone }}
+                                        {% endif %}
+                                    </div>
+
+                                    {% if member.bio %}
+                                    <p class="small text-muted mb-3">{{ member.bio|truncatewords:15 }}</p>
+                                    {% endif %}
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="badge bg-{% if member.is_active %}success{% else %}secondary{% endif %}">
+                                                {% if member.is_active %}Active{% else %}Inactive{% endif %}
+                                            </span>
+                                            <span class="badge bg-info">Order: {{ member.display_order }}</span>
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'admin_team_edit' member.id %}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Team Members</h4>
+                <p class="text-muted">Get started by adding your first team member.</p>
+                <a href="{% url 'admin_team_create' %}" class="btn btn-success">
+                    <i class="fas fa-user-plus me-1"></i> Add First Member
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Active Members</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ team_members|length }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Positions</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ team_members|length }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-briefcase fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,194 @@
+{%load static%}
+
+<!-- Start Footer -->
+<footer class="footer-area bg-f">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <h3>About Us</h3>
+                <p>{{setting.sample_about|safe}}</p>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <h3>Subscribe</h3>
+                <div class="subscribe_form">
+                    <form id="newsletter-form" class="subscribe_form">
+                        {% csrf_token %}
+                        <input name="email" id="subs-email" class="form_input" placeholder="Email Address..." type="email" required>
+                        <button type="submit" class="submit" id="subscribe-btn">
+                            <span id="subscribe-text">SUBSCRIBE</span>
+                            <span id="subscribe-loading" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </button>
+                        <div class="clearfix"></div>
+                        <div id="subscribe-message" class="mt-2" style="min-height: 20px;"></div>
+                    </form>
+                </div>
+
+                <ul class="list-inline f-social">
+                    <li class="list-inline-item"><a href="https://www.facebook.com/{{setting.facebook}}"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                    <li class="list-inline-item"><a href="https://www.twitter.com/{{setting.twitter}}"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                    <li class="list-inline-item"><a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+                    <li class="list-inline-item"><a href="#"><i class="fa fa-google-plus" aria-hidden="true"></i></a></li>
+                    <li class="list-inline-item"><a href="https://www.instagram.com/{{setting.instagram}}"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <h3>Contact information</h3>
+                <p class="lead">{{hotel.address|safe}}</p>
+                <p class="lead"><a href="tel:{{setting.phone}}">{{hotel.phone}}</a></p>
+                <p><a href="mailto:{{setting.email}}">{{hotel.email}}</a></p>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <h3>Opening hours</h3>
+                <p><span class="text-color">Monday: </span>9:Am - 10PM</p>
+                <p><span class="text-color">Tue-Wed :</span> 9:Am - 10PM</p>
+                <p><span class="text-color">Thu-Fri :</span> 9:Am - 10PM</p>
+                <p><span class="text-color">Sat-Sun :</span> 9:PM - 10PM</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="copyright">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <p class="company-name">All Rights Reserved. &copy; 2025 <a href="https://www.laticotech.com">LaticoTECH GH</a> Design By :
+                <a href="https://www.laticotech.com">LATIF, Abubakar</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</footer>
+<!-- End Footer -->
+
+<!-- Newsletter Subscription JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const newsletterForm = document.getElementById('newsletter-form');
+    const subscribeBtn = document.getElementById('subscribe-btn');
+    const subscribeText = document.getElementById('subscribe-text');
+    const subscribeLoading = document.getElementById('subscribe-loading');
+    const subscribeMessage = document.getElementById('subscribe-message');
+    const emailInput = document.getElementById('subs-email');
+
+    newsletterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const email = emailInput.value.trim();
+
+        if (!email) {
+            showMessage('Please enter your email address.', 'error');
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            showMessage('Please enter a valid email address.', 'error');
+            return;
+        }
+
+        // Show loading state
+        setLoadingState(true);
+
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Send AJAX request
+        fetch('{% url "newsletter_subscribe" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrfToken
+            },
+            body: `email=${encodeURIComponent(email)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage(data.message, 'success');
+                newsletterForm.reset();
+            } else {
+                showMessage(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('An error occurred. Please try again.', 'error');
+        })
+        .finally(() => {
+            setLoadingState(false);
+        });
+    });
+
+    function setLoadingState(loading) {
+        if (loading) {
+            subscribeText.style.display = 'none';
+            subscribeLoading.style.display = 'inline';
+            subscribeBtn.disabled = true;
+        } else {
+            subscribeText.style.display = 'inline';
+            subscribeLoading.style.display = 'none';
+            subscribeBtn.disabled = false;
+        }
+    }
+
+    function showMessage(message, type) {
+        subscribeMessage.innerHTML = message;
+        subscribeMessage.className = 'mt-2';
+
+        if (type === 'success') {
+            subscribeMessage.style.color = '#28a745';
+            subscribeMessage.innerHTML = '<i class="fas fa-check-circle me-1"></i>' + message;
+        } else if (type === 'error') {
+            subscribeMessage.style.color = '#dc3545';
+            subscribeMessage.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>' + message;
+        }
+
+        // Auto-hide success messages after 5 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                subscribeMessage.innerHTML = '';
+            }, 5000);
+        }
+    }
+
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    // Add some CSS for better visual feedback
+    const style = document.createElement('style');
+    style.textContent = `
+        #subscribe-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        #subscribe-message {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .form_input:focus {
+            border-color: #d65106;
+            box-shadow: 0 0 0 0.2rem rgba(214, 81, 6, 0.25);
+        }
+    `;
+    document.head.appendChild(style);
+});
+</script>
+	
+	<a href="#" id="back-to-top" title="Back to top" style="display: none;"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></a>
+
+	<!-- ALL JS FILES -->
+	<script src="{%static ''%}js/jquery-3.2.1.min.js"></script>
+	<script src="{%static ''%}js/popper.min.js"></script>
+	<script src="{%static ''%}js/bootstrap.min.js"></script>
+    <!-- ALL PLUGINS -->
+	<script src="{%static ''%}js/jquery.superslides.min.js"></script>
+	<script src="{%static ''%}js/images-loded.min.js"></script>
+	<script src="{%static ''%}js/isotope.min.js"></script>
+	<script src="{%static ''%}js/baguetteBox.min.js"></script>
+	<script src="{%static ''%}js/form-validator.min.js"></script>
+    <script src="{%static ''%}js/contact-form-script.js"></script>
+    <script src="{%static ''%}js/custom.js"></script>

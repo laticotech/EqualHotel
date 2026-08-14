@@ -1,0 +1,208 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}Our Services - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<!--main style-->
+<style>
+    /* Service Styles */
+    .service-card {
+        transition: all 0.3s ease;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 128, 128, 0.1);
+    }
+
+    .btn-outline-teal {
+        border-color: #008080;
+        color: #008080;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-teal:hover {
+        background-color: #008080;
+        border-color: #008080;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 128, 128, 0.3);
+    }
+
+    .teal-btn {
+        background-color: #008080 !important;
+        border-color: #008080 !important;
+        color: white !important;
+        transition: all 0.3s ease;
+    }
+
+    .teal-btn:hover {
+        background-color: #006666 !important;
+        border-color: #006666 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 128, 128, 0.3);
+    }
+
+    .teal-bg {
+        background-color: #008080 !important;
+    }
+
+    .success-icon {
+        animation: bounceIn 0.6s ease;
+    }
+
+    @keyframes bounceIn {
+        0% { transform: scale(0.3); opacity: 0; }
+        50% { transform: scale(1.05); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .btn-circle {
+        border-radius: 50px;
+        padding: 12px 25px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        border-width: 2px;
+        min-width: 160px;
+        margin: 5px;
+    }
+
+    .service-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .service-buttons .btn {
+        width: 100%;
+        max-width: 200px;
+        justify-content: center;
+    }
+
+    /* For single button centering */
+    .single-button-center {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    /* Responsive adjustments */
+    @media (min-width: 768px) {
+        .service-buttons {
+            flex-direction: row;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .service-buttons .btn {
+            width: auto;
+            min-width: 160px;
+        }
+    }
+</style>
+
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>OUR SERVICES</h1>
+                <p class="text-white">Premium services for your comfort and convenience</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Services -->
+<div class="services-box py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="heading-title text-center">
+                    <h2>Hotel Services</h2>
+                    <p>Discover our wide range of premium services</p>
+                </div>
+            </div>
+        </div>
+
+        {% for category_name, services in services_by_category.items %}
+        <div class="category-section mb-5">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="category-title mb-4 teal-text border-bottom pb-2">
+                        <i class="fas fa-star me-2"></i>{{ category_name }}
+                    </h3>
+                </div>
+            </div>
+            <div class="row">
+                {% for service in services %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="service-card card border-0 shadow-sm h-100">
+                        {% if service.image %}
+                        <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="fas {{ service.icon|default:'fa-concierge-bell' }} fa-3x teal-text"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ service.name }}</h5>
+                            <p class="card-text">{{ service.description|truncatewords:20 }}</p>
+
+                            <div class="service-meta mb-3">
+                                {% if service.is_free %}
+                                <span class="badge bg-success">Free</span>
+                                {% else %}
+                                <span class="price teal-text fw-bold">GHC {{ service.price }}</span>
+                                {% endif %}
+
+                                {% if service.available_days %}
+                                <small class="text-muted d-block mt-1">
+                                    <i class="fas fa-calendar me-1"></i>{{ service.available_days }}
+                                </small>
+                                {% endif %}
+
+                                {% if service.available_times %}
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-clock me-1"></i>{{ service.available_times }}
+                                </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pb-4">
+                            <div class="service-buttons">
+                                <a href="{% url 'service_detail' service.id %}" class="btn btn-circle btn-outline-teal">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a>
+                                {% if service.requires_booking %}
+                                <a href="{% url 'service_reservation' service.id %}" class="btn btn-circle teal-btn">
+                                    <i class="fas fa-calendar-check me-2"></i>Book Now
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="row">
+            <div class="col-12 text-center">
+                <p class="text-muted">No services available at the moment.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<!-- End Services -->
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}

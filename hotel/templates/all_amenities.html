@@ -1,0 +1,159 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}Hotel Amenities - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<style>
+    /* Amenities Styles */
+.amenity-card {
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.amenity-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 128, 128, 0.1);
+}
+
+.amenity-icon {
+    transition: all 0.3s ease;
+}
+
+.amenity-card:hover .amenity-icon {
+    transform: scale(1.2);
+    color: #006666 !important;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
+}
+
+.teal-text {
+    color: #008080 !important;
+}
+
+.teal-btn {
+    background-color: #008080 !important;
+    border-color: #008080 !important;
+    color: white !important;
+    transition: all 0.3s ease;
+}
+
+.teal-btn:hover {
+    background-color: #006666 !important;
+    border-color: #006666 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 128, 128, 0.3);
+}
+
+.category-title {
+    font-weight: 600;
+    color: #008080;
+}
+
+.amenity-item {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+
+.amenity-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.amenity-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.amenity-description {
+    line-height: 1.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .amenity-card {
+        margin-bottom: 20px;
+    }
+
+    .amenity-item {
+        margin-bottom: 15px;
+    }
+}
+</style>
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>HOTEL AMENITIES</h1>
+                <p class="text-white">Discover all our premium facilities and services</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Amenities -->
+<div class="amenities-box py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="heading-title text-center">
+                    <h2>All Our Amenities</h2>
+                    <p>Experience luxury and comfort with our comprehensive range of facilities</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Amenities by Category -->
+        {% for category_name, amenities in amenities_by_category.items %}
+        <div class="category-section mb-5">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="category-title mb-4 teal-text border-bottom pb-2">
+                        <i class="fas fa-star me-2"></i>{{ category_name }}
+                    </h3>
+                </div>
+            </div>
+            <div class="row">
+                {% for amenity in amenities %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="amenity-item card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start">
+                                <div class="amenity-icon me-3 mt-1">
+                                    <i class="fas {{ amenity.icon }} fa-lg teal-text"></i>
+                                </div>
+                                <div class="amenity-content flex-grow-1">
+                                    <h5 class="amenity-name mb-2">{{ amenity.name }}</h5>
+                                    <p class="amenity-description text-muted mb-0 small">
+                                        {{ amenity.description }}
+                                    </p>
+                                    {% if amenity.is_featured %}
+                                    <span class="badge bg-warning text-dark mt-2">Featured</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="row">
+            <div class="col-12 text-center">
+                <p class="text-muted">No amenities available at the moment.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<!-- End Amenities -->
+{% endblock %}
+
+{% block foot %}{% include 'footer.html' %}{% endblock %}

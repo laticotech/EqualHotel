@@ -1,0 +1,1627 @@
+{%load static%}
+{% load embed_video_tags %}
+
+<!-- display message on form -->
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags}}" role="alert">
+            {{message}}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<!--booking style-->
+<style>
+    /* Booking Section Styles */
+    .booking-section-box {
+        position: relative;
+    }
+
+    .booking-form .form-group label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .booking-form .form-control {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        height: 45px;
+    }
+
+    .booking-form .form-control:focus {
+        border-color: #008080;
+        box-shadow: 0 0 0 0.2rem rgba(0, 128, 128, 0.25);
+    }
+
+    .room-type-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .room-type-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    /* Modal Styles */
+    .room-option {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: 1px solid #e0e0e0;
+    }
+
+    .room-option:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border-color: #008080;
+    }
+
+    .amenities .badge {
+        font-size: 0.7rem;
+        margin-bottom: 2px;
+    }
+
+    .price-section {
+        border-left: 2px solid #008080;
+        padding-left: 15px;
+    }
+
+    .modal-content {
+        border-radius: 10px;
+    }
+
+    .modal-header {
+        background: #008080;
+        color: white;
+        border-bottom: none;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .modal-header .close {
+        color: white;
+        opacity: 0.8;
+    }
+
+    .modal-header .close:hover {
+        opacity: 1;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .booking-form .col-md-3,
+        .booking-form .col-md-2 {
+            margin-bottom: 15px;
+        }
+
+        .room-type-card {
+            margin-bottom: 20px;
+        }
+
+        .price-section {
+            border-left: none;
+            border-top: 2px solid #008080;
+            padding-left: 0;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+    }
+
+    /* Add these to your existing style section */
+
+/* Fix button styling */
+.booking-form .btn {
+    min-height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    white-space: nowrap;
+    padding: 10px 5px;
+    border: none;
+    font-weight: 600;
+}
+
+.booking-form .btn-block {
+    width: 100%;
+}
+
+/* Ensure modal displays properly */
+.modal-backdrop {
+    z-index: 1040 !important;
+}
+
+.modal {
+    z-index: 1050 !important;
+}
+
+#availabilityModal,
+#bookingModal {
+    display: none; /* Hidden by default */
+}
+
+#availabilityModal.show,
+#bookingModal.show {
+    display: block; /* Show when has 'show' class */
+}
+
+/* Fix form group alignment */
+.booking-form .form-group {
+    margin-bottom: 0;
+}
+
+.booking-form .row.align-items-end {
+    align-items: flex-end;
+}
+
+/* Button hover effects */
+.booking-form .btn:hover {
+    background: #006666 !important;
+    border-color: #006666 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Responsive button fixes */
+@media (max-width: 768px) {
+    .booking-form .btn {
+        min-height: 40px;
+        font-size: 13px;
+        margin-top: 0;
+    }
+
+    .booking-form .form-group {
+        margin-bottom: 15px;
+    }
+
+    .booking-form .row.align-items-end {
+        align-items: stretch;
+    }
+}
+
+/* Loading spinner styling */
+.spinner-border.text-primary {
+    color: #008080 !important;
+}
+
+/* Ensure modal content is visible */
+.modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Room option card improvements */
+.room-option .card-body {
+    padding: 20px;
+}
+
+.room-option .card-title {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/* Price section improvements */
+.price-section .h4 {
+    color: #008080;
+    font-weight: 700;
+}
+
+.price-section .h5 {
+    color: #28a745;
+    font-weight: 700;
+}
+</style>
+
+<!--remaining content styles-->
+<style>
+	/* Service Card Styles */
+.service-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.service-icon {
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover .service-icon {
+    transform: scale(1.1);
+}
+
+/* Room Card Styles */
+.room-card {
+    transition: transform 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.room-card:hover {
+    transform: translateY(-3px);
+}
+
+.room-image-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.room-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+}
+
+/* Section Spacing */
+section {
+    padding: 80px 0;
+}
+
+section.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+/* Heading Styles */
+.heading-title h2 {
+    position: relative;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.heading-title h2:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(45deg, #ff6b6b, #ffa726);
+}
+</style>
+
+<!-- Amenities style-->
+<style>
+    /* Amenities Styles */
+.amenity-card {
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.amenity-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 128, 128, 0.1);
+}
+
+.amenity-icon {
+    transition: all 0.3s ease;
+}
+
+.amenity-card:hover .amenity-icon {
+    transform: scale(1.2);
+    color: #006666 !important;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
+}
+
+.teal-text {
+    color: #008080 !important;
+}
+
+.teal-btn {
+    background-color: #008080 !important;
+    border-color: #008080 !important;
+    color: white !important;
+    transition: all 0.3s ease;
+}
+
+.teal-btn:hover {
+    background-color: #006666 !important;
+    border-color: #006666 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 128, 128, 0.3);
+}
+
+.category-title {
+    font-weight: 600;
+    color: #008080;
+}
+
+.amenity-item {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+
+.amenity-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.amenity-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.amenity-description {
+    line-height: 1.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .amenity-card {
+        margin-bottom: 20px;
+    }
+
+    .amenity-item {
+        margin-bottom: 15px;
+    }
+}
+</style>
+
+<!-- Start Booking Section -->
+<div class="booking-section-box" style="padding: 50px 0; background: #f8f9fa;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="heading-title text-center">
+                    <h2>Check Availability & Rates</h2>
+                    <p>Find the perfect room for your stay</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Booking Form -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="booking-form" style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                    <form id="availabilityForm">
+                        <div class="row align-items-end">  <!-- Changed to align-items-end for better alignment -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="check_in">Check-In Date</label>
+                                    <input type="date" class="form-control" id="check_in" name="check_in" required>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="check_out">Check-Out Date</label>
+                                    <input type="date" class="form-control" id="check_out" name="check_out" required>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="adults">Adults</label>
+                                    <select class="form-control" id="adults" name="adults">
+                                        <option value="1">1 Adult</option>
+                                        <option value="2" selected>2 Adults</option>
+                                        <option value="3">3 Adults</option>
+                                        <option value="4">4 Adults</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="children">Children</label>
+                                    <select class="form-control" id="children" name="children">
+                                        <option value="0" selected>0 Children</option>
+                                        <option value="1">1 Child</option>
+                                        <option value="2">2 Children</option>
+                                        <option value="3">3 Children</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+								<div class="form-group">
+									<button type="submit" class="btn btn-primary btn-block"
+											style="background: #008080; border-color: #008080;">
+										Check Rates
+									</button>
+								</div>
+							</div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Room Types -->
+        <div class="row" style="margin-top: 50px;">
+            <div class="col-lg-12">
+                <div class="heading-title text-center">
+                    <h3>Featured Room Types</h3>
+                    <p>Explore our luxurious accommodations</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for room_type in room_types %}
+            <div class="col-lg-3 col-md-6 col-sm-12">
+                <div class="room-type-card" style="background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 30px;">
+                    <div class="room-image" style="height: 200px; overflow: hidden;">
+                        <img src="{{ room_type.featured_image.url }}"
+                             alt="{{ room_type.name }}"
+                             style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="room-details" style="padding: 20px;">
+                        <h4 style="color: #333; margin-bottom: 10px;">{{ room_type.name }}</h4>
+                        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                            <i class="fa fa-user"></i> Up to {{ room_type.capacity }} guests<br>
+                            <i class="fa fa-bed"></i> {{ room_type.bed_type }}<br>
+                            <i class="fa fa-arrows-alt"></i> {{ room_type.size }}
+                        </p>
+                        <div class="room-price" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 18px; font-weight: bold; color: #008080;">
+                                GHS {{ room_type.base_price }}/night
+                            </span>
+                            <a href="/room/{{ room_type.slug }}" class="btn btn-outline-primary btn-sm rounded-pill border-teal text-primary" style="font-size: 0.75rem; padding: 0.25rem 0.75rem;">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-lg-12 text-center">
+                <p>No rooms available at the moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Call to Action -->
+        <div class="row" style="margin-top: 30px;">
+            <div class="col-lg-12 text-center">
+                <a href="/accommodations" class="btn btn-primary" style="background: #008080; border-color: #008080; padding: 12px 30px;">
+                    View All Rooms & Suites
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Booking Section -->
+
+<!-- Availability Results Modal -->
+<div class="modal fade" id="availabilityModal" tabindex="-1" role="dialog" aria-labelledby="availabilityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="availabilityModalLabel">Available Rooms</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="availabilityResults">
+                    <!-- Results will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Form Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookingModalLabel">Complete Your Booking</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="bookingForm">
+                    <div id="bookingSummary" class="mb-3 p-3 bg-light rounded">
+                        <!-- Booking summary will be loaded here -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guest_name">Full Name *</label>
+                        <input type="text" class="form-control" id="guest_name" name="guest_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guest_email">Email Address *</label>
+                        <input type="email" class="form-control" id="guest_email" name="guest_email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guest_phone">Phone Number *</label>
+                        <input type="tel" class="form-control" id="guest_phone" name="guest_phone" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guest_address">Address</label>
+                        <textarea class="form-control" id="guest_address" name="guest_address" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="special_requests">Special Requests</label>
+                        <textarea class="form-control" id="special_requests" name="special_requests" rows="3" placeholder="Any special requirements or requests..."></textarea>
+                    </div>
+
+                    <input type="hidden" id="selected_room_type" name="room_type_id">
+                    <input type="hidden" id="selected_check_in" name="check_in">
+                    <input type="hidden" id="selected_check_out" name="check_out">
+                    <input type="hidden" id="selected_adults" name="adults">
+                    <input type="hidden" id="selected_children" name="children">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmBooking" style="background: #008080; border-color: #008080;">
+                    Confirm Booking
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const availabilityForm = document.getElementById('availabilityForm');
+
+    availabilityForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const formData = new FormData(this);
+        const checkIn = document.getElementById('check_in').value;
+        const checkOut = document.getElementById('check_out').value;
+
+        if (!checkIn || !checkOut) {
+            alert('Please select both check-in and check-out dates');
+            return false;
+        }
+
+        // Validate dates
+        const checkInDate = new Date(checkIn);
+        const checkOutDate = new Date(checkOut);
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        if (checkInDate < today) {
+            alert('Check-in date cannot be in the past');
+            return false;
+        }
+
+        if (checkInDate >= checkOutDate) {
+            alert('Check-out date must be after check-in date');
+            return false;
+        }
+
+        // Show loading state
+        document.getElementById('availabilityResults').innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <p class="mt-2">Checking availability...</p>
+            </div>
+        `;
+
+        // Show modal
+        $('#availabilityModal').modal('show');
+
+        // Convert FormData to URL parameters
+        const params = new URLSearchParams();
+        for (const [key, value] of formData.entries()) {
+            params.append(key, value);
+        }
+
+        console.log('Making request to:', '/bookings/check-availability/?' + params.toString());
+
+        // Use fetch with the correct URL path
+        fetch('/bookings/check-availability/?' + params.toString())
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (response.status === 404) {
+                    throw new Error('URL not found. Check your Django URL configuration.');
+                }
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received data:', data);
+
+                if (data.error) {
+                    document.getElementById('availabilityResults').innerHTML = `
+                        <div class="alert alert-danger">
+                            <h6>Error</h6>
+                            <p>${data.error}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (!data.available_rooms || data.available_rooms.length === 0) {
+                    document.getElementById('availabilityResults').innerHTML = `
+                        <div class="alert alert-warning">
+                            <h6>No Rooms Available</h6>
+                            <p>Sorry, no rooms are available for your selected dates. Please try different dates.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let resultsHtml = `
+                    <div class="alert alert-info">
+                        <h6>Search Results</h6>
+                        <p>Check-in: ${data.check_in} | Check-out: ${data.check_out}<br>
+                        Guests: ${data.adults} Adults, ${data.children} Children</p>
+                    </div>
+                `;
+
+                data.available_rooms.forEach(room => {
+                    resultsHtml += `
+                        <div class="card mb-3 room-option">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        ${room.featured_image ?
+                                            `<img src="${room.featured_image}" alt="${room.name}" class="img-fluid rounded" style="height: 120px; object-fit: cover;">` :
+                                            '<div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 120px;">No Image</div>'
+                                        }
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5 class="card-title">${room.name}</h5>
+                                        <p class="card-text text-muted small">
+                                            <i class="fa fa-user"></i> Up to ${room.capacity} guests<br>
+                                            <i class="fa fa-bed"></i> ${room.bed_type || 'Not specified'}<br>
+                                            <i class="fa fa-arrows-alt"></i> ${room.size || 'Not specified'}
+                                        </p>
+                                        <p class="card-text small">${room.description || 'No description available'}</p>
+                                        ${room.amenities && room.amenities.length > 0 ? `
+                                            <div class="amenities">
+                                                <strong class="small">Amenities:</strong>
+                                                ${room.amenities.map(amenity =>
+                                                    `<span class="badge badge-light mr-1">${amenity.name}</span>`
+                                                ).join('')}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                    <div class="col-md-3 text-right">
+                                        <div class="price-section">
+                                            <div class="text-muted small">Per night</div>
+                                            <div class="h4 text-primary">GHS ${room.base_price ? room.base_price.toFixed(2) : '0.00'}</div>
+                                            <div class="text-muted small">Total for ${room.nights} nights</div>
+                                            <div class="h5 text-success">GHS ${room.total_price ? room.total_price.toFixed(2) : '0.00'}</div>
+                                            <div class="availability small text-success">
+                                                <i class="fa fa-check"></i> ${room.available_count || 0} available
+                                            </div>
+                                            <button class="btn btn-primary mt-2 book-room-btn"
+                                                    data-room-id="${room.id}"
+                                                    data-room-name="${room.name}"
+                                                    data-base-price="${room.base_price || 0}"
+                                                    data-total-price="${room.total_price || 0}"
+                                                    data-nights="${room.nights || 0}"
+                                                    style="background: #008080; border-color: #008080;">
+                                                Book Now
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('availabilityResults').innerHTML = resultsHtml;
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                document.getElementById('availabilityResults').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>Connection Error</h6>
+                        <p>Unable to check availability at the moment.</p>
+                        <small>Error: ${error.message}</small>
+                        <p class="mt-2">Please try again or contact us directly.</p>
+                    </div>
+                `;
+            });
+
+        return false;
+    });
+
+    // ADD THIS MISSING EVENT LISTENER FOR BOOK NOW BUTTONS
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('book-room-btn')) {
+            console.log('Book Now button clicked');
+
+            const roomId = e.target.getAttribute('data-room-id');
+            const roomName = e.target.getAttribute('data-room-name');
+            const basePrice = parseFloat(e.target.getAttribute('data-base-price'));
+            const totalPrice = parseFloat(e.target.getAttribute('data-total-price'));
+            const nights = parseInt(e.target.getAttribute('data-nights'));
+
+            const checkIn = document.getElementById('check_in').value;
+            const checkOut = document.getElementById('check_out').value;
+            const adults = document.getElementById('adults').value;
+            const children = document.getElementById('children').value;
+
+            console.log('Booking details:', {
+                roomId, roomName, basePrice, totalPrice, nights,
+                checkIn, checkOut, adults, children
+            });
+
+            // Set hidden fields
+            document.getElementById('selected_room_type').value = roomId;
+            document.getElementById('selected_check_in').value = checkIn;
+            document.getElementById('selected_check_out').value = checkOut;
+            document.getElementById('selected_adults').value = adults;
+            document.getElementById('selected_children').value = children;
+
+            // Update booking summary
+            document.getElementById('bookingSummary').innerHTML = `
+                <h6>Booking Summary</h6>
+                <div class="row">
+                    <div class="col-6">
+                        <strong>Room:</strong> ${roomName}<br>
+                        <strong>Check-in:</strong> ${checkIn}<br>
+                        <strong>Check-out:</strong> ${checkOut}
+                    </div>
+                    <div class="col-6">
+                        <strong>Guests:</strong> ${adults} Adults, ${children} Children<br>
+                        <strong>Nights:</strong> ${nights}<br>
+                        <strong>Total:</strong> GHS ${totalPrice.toFixed(2)}
+                    </div>
+                </div>
+            `;
+
+            // Clear previous form data
+            document.getElementById('guest_name').value = '';
+            document.getElementById('guest_email').value = '';
+            document.getElementById('guest_phone').value = '';
+            document.getElementById('guest_address').value = '';
+            document.getElementById('special_requests').value = '';
+
+            // Close availability modal and open booking modal
+            $('#availabilityModal').modal('hide');
+            $('#bookingModal').modal('show');
+        }
+    });
+
+    // Confirm booking function
+    document.getElementById('confirmBooking').addEventListener('click', function() {
+        const formData = {
+            room_type_id: document.getElementById('selected_room_type').value,
+            check_in: document.getElementById('selected_check_in').value,
+            check_out: document.getElementById('selected_check_out').value,
+            adults: document.getElementById('selected_adults').value,
+            children: document.getElementById('selected_children').value,
+            guest_name: document.getElementById('guest_name').value,
+            guest_email: document.getElementById('guest_email').value,
+            guest_phone: document.getElementById('guest_phone').value,
+            guest_address: document.getElementById('guest_address').value,
+            special_requests: document.getElementById('special_requests').value
+        };
+
+        console.log('Submitting booking:', formData);
+
+        // Basic validation
+        if (!formData.guest_name || !formData.guest_email || !formData.guest_phone) {
+            alert('Please fill in all required fields');
+            return;
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.guest_email)) {
+            alert('Please enter a valid email address');
+            return;
+        }
+
+        const confirmBtn = this;
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+
+        fetch('/bookings/create-booking/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken') // Add CSRF token for Django
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Booking response:', data);
+            if (data.success) {
+                $('#bookingModal').modal('hide');
+                window.location.href = `/bookings/booking-success/${data.booking_reference}`;
+            } else {
+                alert(data.error || 'An error occurred during booking');
+            }
+        })
+        .catch(error => {
+            console.error('Booking error:', error);
+            alert('An error occurred while processing your booking. Please try again.');
+        })
+        .finally(() => {
+            confirmBtn.disabled = false;
+            confirmBtn.innerHTML = 'Confirm Booking';
+        });
+    });
+
+    // CSRF token function for Django
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Set minimum date for check-in to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('check_in').setAttribute('min', today);
+
+    // Update check-out min date when check-in changes
+    document.getElementById('check_in').addEventListener('change', function() {
+        const checkInDate = this.value;
+        if (checkInDate) {
+            const nextDay = new Date(checkInDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+            const nextDayStr = nextDay.toISOString().split('T')[0];
+            document.getElementById('check_out').setAttribute('min', nextDayStr);
+
+            // If current check-out is before new min, clear it
+            if (document.getElementById('check_out').value && document.getElementById('check_out').value <= checkInDate) {
+                document.getElementById('check_out').value = '';
+            }
+        }
+    });
+});
+</script>
+
+<!-- The rest of your content -->
+
+<!-- Start Hotel Amenities -->
+<section id="amenities" class="bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="heading-title text-center mb-5">
+                    <h2>Our Hotel Amenities</h2>
+                    <p class="lead">Enjoy our premium facilities and services designed for your comfort</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Amenities Grid -->
+        <div class="row">
+            {% for amenity in hotel.amenities.all|slice:":8" %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="card amenity-card h-100 border-0 shadow-sm hover-lift">
+                    <div class="card-body text-center p-4">
+                        <div class="amenity-icon mb-3">
+                            <i class="fas {{ amenity.icon }} fa-2x teal-text"></i>
+                        </div>
+                        <h5 class="card-title mb-2">{{ amenity.name }}</h5>
+                        <p class="card-text text-muted small">{{ amenity.description|truncatewords:15 }}</p>
+                        <span class="badge bg-light text-dark small">{{ amenity.get_category_display }}</span>
+                        {% if amenity.is_featured %}
+                        <span class="badge bg-warning text-dark small ms-1">Featured</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">No amenities available at the moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- View All Button -->
+        {% if hotel.amenities.count > 8 %}
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="{% url 'all_amenities' %}" class="btn teal-btn btn-lg">
+                    <i class="fas fa-list me-2"></i> View All Amenities
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+<!-- End Hotel Amenities -->
+
+<!-- Start Services -->
+<section id="services" class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="heading-title text-center mb-5">
+                    <h2>Our Premium Services</h2>
+                    <p class="lead">Enhancing your stay with exceptional amenities</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for service in services %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="service-card card h-100 text-center border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0 pt-4">
+                        {% if service.image %}
+                            <img src="{{ service.image.url }}" class="service-img" alt="{{ service.name }}" style="height: 80px; width: 80px; object-fit: cover; border-radius: 50%;">
+                        {% elif service.icon %}
+                            <div class="service-icon mx-auto teal-text" style="font-size: 3rem;">
+                                <i class="fas {{ service.icon }}"></i>
+                            </div>
+                        {% else %}
+                            <div class="service-icon mx-auto teal-text" style="font-size: 3rem;">
+                                <i class="fas fa-concierge-bell"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ service.name }}</h5>
+                        <p class="card-text text-muted">
+                            {{ service.description|truncatewords:15 }}
+                        </p>
+
+                        <!-- Pricing -->
+                        <div class="service-price mb-2">
+                            {% if service.is_free %}
+                                <span class="badge bg-success">FREE</span>
+                            {% elif service.price %}
+                                <span class="teal-text fw-bold">GHS {{ service.price }}</span>
+                            {% else %}
+                                <span class="text-muted">Price on request</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Availability -->
+                        <div class="service-availability small text-muted mb-2">
+                            <div><i class="fas fa-calendar-alt me-1"></i> {{ service.available_days|default:"Daily" }}</div>
+                            <div><i class="fas fa-clock me-1"></i> {{ service.available_times|default:"24/7" }}</div>
+                        </div>
+
+                        <!-- Booking Requirement -->
+                        {% if service.requires_booking %}
+                            <span class="badge bg-warning text-dark">Booking Required</span>
+                        {% else %}
+                            <span class="badge bg-info">Walk-in Available</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pb-4">
+                        <div class="service-buttons">
+                            <a href="{% url 'service_detail' service.id %}" class="btn btn-circle btn-outline-teal">
+                                <i class="fas fa-eye me-2"></i> View Details
+                            </a>
+                            {% if service.requires_booking %}
+                                <a href="{% url 'service_reservation' service.id %}" class="btn btn-circle teal-btn">
+                                    <i class="fas fa-calendar-check me-2"></i> Book Now
+                                </a>
+                            {% else %}
+                                <a href="{% url 'service_detail' service.id %}" class="btn btn-circle teal-btn">
+                                    <i class="fas fa-info-circle me-2"></i> Learn More
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">No services available at the moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- View All Services Button -->
+        {% if services %}
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="{% url 'service_list' %}" class="btn teal-btn btn-lg">
+                    <i class="fas fa-list me-2"></i> View All Services
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+<!-- End Services -->
+
+<style>
+    /* Service Styles */
+    .service-card {
+        transition: all 0.3s ease;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 128, 128, 0.1);
+    }
+
+    .btn-outline-teal {
+        border-color: #008080;
+        color: #008080;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-teal:hover {
+        background-color: #008080;
+        border-color: #008080;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 128, 128, 0.3);
+    }
+
+    .teal-btn {
+        background-color: #008080 !important;
+        border-color: #008080 !important;
+        color: white !important;
+        transition: all 0.3s ease;
+    }
+
+    .teal-btn:hover {
+        background-color: #006666 !important;
+        border-color: #006666 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 128, 128, 0.3);
+    }
+
+    .btn-circle {
+        border-radius: 50px;
+        padding: 12px 25px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        border-width: 2px;
+        min-width: 160px;
+        margin: 5px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .service-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .service-buttons .btn {
+        width: 100%;
+        max-width: 200px;
+        justify-content: center;
+    }
+
+    /* Responsive adjustments */
+    @media (min-width: 768px) {
+        .service-buttons {
+            flex-direction: row;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .service-buttons .btn {
+            width: auto;
+            min-width: 160px;
+        }
+    }
+</style>
+
+<!-- Start sample about -->
+<div class="qt-box qt-background">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 ml-auto mr-auto text-center">
+
+                <p class="lead">
+                    {{ hotel.about|striptags|truncatechars:150|safe }}
+                </p>
+                <a href="/about" class="btn btn-primary btn-sm mt-2">
+                    Read More
+                </a>
+                <br>
+                <span class="lead">{{ hotel.tagline }}</span>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End sample about -->
+
+
+<!-- Start Customer Reviews -->
+<div class="customer-reviews-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="heading-title text-center">
+                    <h2>Customer Reviews</h2>
+                    <p>What our guests say about their experience at {{ hotel.name }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10 mx-auto text-center">
+                <div id="reviewsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+                    <!-- Carousel Indicators -->
+                    {% if featured_reviews|length > 1 %}
+                    <div class="carousel-indicators">
+                        {% for review in featured_reviews %}
+                        <button type="button" data-bs-target="#reviewsCarousel" data-bs-slide-to="{{ forloop.counter0 }}"
+                                {% if forloop.first %}class="active" aria-current="true"{% endif %}
+                                aria-label="Slide {{ forloop.counter }}"></button>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Carousel Items -->
+                    <div class="carousel-inner">
+                        {% for review in featured_reviews %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <div class="review-content px-4">
+                                    <div class="img-box p-2 border rounded-circle m-auto bg-white">
+                                        <img class="d-block w-100 rounded-circle" src="{% static 'images/quotations-button.png' %}" alt="{{ review.guest_name }}">
+                                    </div>
+
+                                    <!-- Star Rating -->
+                                    <div class="star-rating mb-3">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= review.rating %}
+                                                <i class="fas fa-star text-teal"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-teal"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+
+                                    <h5 class="mb-2">
+                                        <strong class="text-teal">{{ review.guest_name }}</strong>
+                                    </h5>
+
+                                    {% if review.guest_country %}
+                                    <h6 class="text-muted mb-2">
+                                        <i class="fas fa-map-marker-alt me-1"></i>{{ review.guest_country }}
+                                    </h6>
+                                    {% endif %}
+
+                                    <h6 class="review-title mb-3 fw-bold">{{ review.title }}</h6>
+
+                                    <p class="review-text mb-3">{{ review.comment|truncatewords:25 }}</p>
+
+                                    {% if review.stay_date %}
+                                    <small class="text-muted">
+                                        <i class="far fa-calendar me-1"></i>Stayed {{ review.stay_date|date:"M Y" }}
+                                    </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% empty %}
+                            <!-- Default content when no featured reviews -->
+                            <div class="carousel-item active">
+                                <div class="review-content px-4">
+                                    <div class="img-box p-2 border rounded-circle m-auto bg-white">
+                                        <img class="d-block w-100 rounded-circle" src="{% static 'images/quotations-button.png' %}" alt="Default">
+                                    </div>
+
+                                    <!-- Default star rating -->
+                                    <div class="star-rating mb-3">
+                                        {% for i in "12345" %}
+                                            <i class="fas fa-star text-teal"></i>
+                                        {% endfor %}
+                                    </div>
+
+                                    <h5 class="mb-2">
+                                        <strong class="text-teal">Be the First to Review</strong>
+                                    </h5>
+                                    <h6 class="text-muted mb-3">Share Your Experience</h6>
+                                    <p class="review-text mb-3">Your feedback helps us improve and assists other guests in making their choice.</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Carousel Controls -->
+                    {% if featured_reviews|length > 1 %}
+                    <button class="carousel-control-prev" type="button" data-bs-target="#reviewsCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#reviewsCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                    {% endif %}
+                </div>
+
+                <!-- Quick Stats -->
+                {% if total_reviews > 0 %}
+                <div class="quick-stats mt-5 pt-4 border-top">
+                    <div class="row justify-content-center">
+                        <div class="col-auto">
+                            <div class="stat-item text-center mx-3">
+                                <h3 class="text-teal mb-1 fw-bold">{{ total_reviews }}</h3>
+                                <small class="text-muted">Total Reviews</small>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat-item text-center mx-3">
+                                <h3 class="text-teal mb-1 fw-bold">{{ average_rating }}</h3>
+                                <small class="text-muted">Avg Rating</small>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat-item text-center mx-3">
+                                <h3 class="text-teal mb-1 fw-bold">{{ featured_reviews|length }}</h3>
+                                <small class="text-muted">Featured</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Action Buttons -->
+                <div class="row mt-4 justify-content-center">
+                    <div class="col-md-5 col-sm-6 mb-3">
+                        <a class="btn btn-teal btn-lg w-100" href="{% url 'reviews_list' %}">
+                            <i class="fas fa-list me-2"></i>View All Reviews
+                        </a>
+                    </div>
+                    <div class="col-md-5 col-sm-6 mb-3">
+                        <a class="btn btn-outline-teal btn-lg w-100" href="{% url 'submit_review' %}">
+                            <i class="fas fa-edit me-2"></i>Write a Review
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Customer Reviews -->
+
+<style>
+.customer-reviews-box {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 80px 0;
+}
+
+/* Heading title underline */
+.heading-title h2 {
+    color: #010101;
+    font-size: 28px;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 500;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 15px;
+}
+
+.heading-title h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: #008080; /* Teal color for underline */
+    border-radius: 2px;
+}
+
+.review-content {
+    padding: 40px 20px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Image box border - changed to teal */
+.img-box {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 25px;
+    border: 3px solid #008080 !important; /* Teal border */
+    background: white;
+}
+
+.star-rating {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+.star-rating .fas.fa-star,
+.star-rating .far.fa-star {
+    color: #008080 !important; /* Teal stars */
+}
+
+.review-text {
+    font-size: 1.1em;
+    line-height: 1.6;
+    color: #555;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Review title with teal underline */
+.review-title {
+    color: #1f1f1f;
+    font-size: 1.1em;
+    font-weight: 600;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 8px;
+}
+
+.review-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: #008080; /* Teal underline */
+    border-radius: 1px;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 50px;
+    height: 50px;
+    background: #008080; /* Teal background */
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.9;
+}
+
+.carousel-control-prev {
+    left: -25px;
+}
+
+.carousel-control-next {
+    right: -25px;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.carousel-indicators {
+    bottom: -50px;
+}
+
+.carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #6c757d;
+    border: none;
+    margin: 0 5px;
+}
+
+.carousel-indicators button.active {
+    background-color: #008080; /* Teal active indicator */
+}
+
+.quick-stats {
+    border-top: 2px solid #dee2e6;
+}
+
+.stat-item h3 {
+    font-size: 2.5rem;
+}
+
+.text-teal {
+    color: #008080 !important; /* Teal text color */
+}
+
+.btn-teal {
+    background: #008080; /* Teal button */
+    border-color: #008080;
+    color: white;
+    padding: 12px 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-teal:hover {
+    background: #006666; /* Darker teal on hover */
+    border-color: #006666;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 128, 128, 0.3);
+}
+
+.btn-outline-teal {
+    border-color: #008080; /* Teal outline */
+    color: #008080;
+    padding: 12px 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-teal:hover {
+    background: #008080;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 128, 128, 0.3);
+}
+
+/* Animation for carousel items */
+.carousel-item {
+    transition: transform 0.6s ease-in-out;
+}
+
+.carousel-item.active {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    .customer-reviews-box {
+        padding: 60px 0;
+    }
+
+    .review-content {
+        padding: 30px 15px;
+        min-height: 350px;
+    }
+
+    .img-box {
+        width: 100px;
+        height: 100px;
+    }
+
+    .carousel-control-prev {
+        left: -15px;
+    }
+
+    .carousel-control-next {
+        right: -15px;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 40px;
+        height: 40px;
+    }
+
+    .stat-item h3 {
+        font-size: 2rem;
+    }
+
+    .btn-teal,
+    .btn-outline-teal {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
+
+    .heading-title h2 {
+        font-size: 24px;
+    }
+
+    .review-title {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 576px) {
+    .review-content {
+        min-height: 400px;
+    }
+
+    .review-text {
+        font-size: 1em;
+    }
+
+    .quick-stats .col-auto {
+        margin-bottom: 15px;
+    }
+
+    .heading-title h2::after {
+        width: 60px;
+    }
+
+    .review-title::after {
+        width: 40px;
+    }
+}
+</style>
+
+<!-- Initialize Carousel with JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-rotate carousel every 5 seconds
+    const carousel = document.getElementById('reviewsCarousel');
+    if (carousel) {
+        const carouselInstance = new bootstrap.Carousel(carousel, {
+            interval: 5000,
+            wrap: true,
+            pause: 'hover'
+        });
+
+        // Pause carousel when user interacts with it
+        carousel.addEventListener('mouseenter', function() {
+            carouselInstance.pause();
+        });
+
+        carousel.addEventListener('mouseleave', function() {
+            carouselInstance.cycle();
+        });
+    }
+});
+</script>
+
+<!-- Start Contact info -->
+<div class="contact-imfo-box">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-4 arrow-right">
+				<i class="fa fa-volume-control-phone"></i>
+				<div class="overflow-hidden">
+					<h4>Phone</h4>
+					<p class="lead">
+						{{hotel.phone}}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-4 arrow-right">
+				<i class="fa fa-envelope"></i>
+				<div class="overflow-hidden">
+					<h4>Email</h4>
+					<p class="lead">
+						{{hotel.email}}
+					</p>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<i class="fa fa-map-marker"></i>
+				<div class="overflow-hidden">
+					<h4>Location</h4>
+					<p class="lead">
+						{{hotel.address|safe}}
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- End Contact info -->

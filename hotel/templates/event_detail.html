@@ -1,0 +1,433 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}{{ event.title }} - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>EVENT DETAILS</h1>
+                <p class="text-white">{{ event.title }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Event Details -->
+<div class="event-details-section py-5">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Left Sidebar - Other Events -->
+            <div class="col-lg-2">
+                {% if other_events %}
+                <div class="other-events-card card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0"><i class="fa fa-calendar teal-text me-2"></i>Other Events</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for other_event in other_events %}
+                        <div class="other-event-item mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="text-center">
+                                {% if other_event.image %}
+                                <img src="{{ other_event.image.url }}" class="img-fluid rounded mb-2"
+                                     alt="{{ other_event.title }}" style="height: 120px; width: 100%; object-fit: cover;">
+                                {% else %}
+                                <img src="{% static 'images/default-event.jpg' %}" class="img-fluid rounded mb-2"
+                                     alt="Default Event Image" style="height: 120px; width: 100%; object-fit: cover;">
+                                {% endif %}
+                                <h6 class="mb-1 fw-semibold teal-text">{{ other_event.title|truncatewords:4 }}</h6>
+                                <p class="mb-2 text-muted small">
+                                    <i class="fa fa-calendar me-1"></i>
+                                    {{ other_event.start_date|date:"M d" }}
+                                </p>
+                                <a href="{% url 'event_detail' other_event.id %}" class="btn btn-sm teal-btn w-100">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-7">
+                <!-- Event Image -->
+                <div class="event-gallery mb-4">
+                    <div class="main-image">
+                        {% if event.image %}
+                        <img src="{{ event.image.url }}" class="img-fluid rounded shadow"
+                             alt="{{ event.title }}" style="width: 100%; height: 400px; object-fit: cover;">
+                        {% else %}
+                        <img src="{% static 'images/default-event.jpg' %}" class="img-fluid rounded shadow"
+                             alt="Default Event Image" style="width: 100%; height: 400px; object-fit: cover;">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Event Information -->
+                <div class="event-info-card card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <span class="badge bg-primary mb-2">{{ event.get_event_type_display }}</span>
+                                <h2 class="teal-text mb-2">{{ event.title }}</h2>
+                                <p class="lead text-muted mb-0">{{ event.description|truncatewords:30 }}</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="event-price">
+                                    {% if event.price > 0 %}
+                                    <h3 class="teal-text mb-1">${{ event.price }}</h3>
+                                    <h5 class="text-muted">per person</h5>
+                                    {% else %}
+                                    <h3 class="teal-text mb-1">Free</h3>
+                                    <h5 class="text-muted">No Charge</h5>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Details -->
+                <div class="event-details-card card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0"><i class="fa fa-info-circle teal-text me-2"></i>Event Details</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li class="mb-3 d-flex align-items-center">
+                                        <i class="fa fa-calendar teal-text me-3 fs-5"></i>
+                                        <div>
+                                            <strong class="d-block">Start Date & Time</strong>
+                                            <span class="text-muted">{{ event.start_date|date:"F d, Y H:i" }}</span>
+                                        </div>
+                                    </li>
+                                    <li class="mb-3 d-flex align-items-center">
+                                        <i class="fa fa-calendar-times teal-text me-3 fs-5"></i>
+                                        <div>
+                                            <strong class="d-block">End Date & Time</strong>
+                                            <span class="text-muted">{{ event.end_date|date:"F d, Y H:i" }}</span>
+                                        </div>
+                                    </li>
+                                    <li class="mb-3 d-flex align-items-center">
+                                        <i class="fa fa-map-marker-alt teal-text me-3 fs-5"></i>
+                                        <div>
+                                            <strong class="d-block">Location</strong>
+                                            <span class="text-muted">{{ event.location }}</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li class="mb-3 d-flex align-items-center">
+                                        <i class="fa fa-users teal-text me-3 fs-5"></i>
+                                        <div>
+                                            <strong class="d-block">Capacity</strong>
+                                            <span class="text-muted">
+                                                {% if event.max_attendees > 0 %}
+                                                {{ event.current_attendees }}/{{ event.max_attendees }} attendees
+                                                {% else %}
+                                                Unlimited attendees
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </li>
+                                    <li class="mb-3 d-flex align-items-center">
+                                        <i class="fa fa-tag teal-text me-3 fs-5"></i>
+                                        <div>
+                                            <strong class="d-block">Price</strong>
+                                            <span class="text-muted">
+                                                {% if event.price > 0 %}
+                                                ${{ event.price }} per person
+                                                {% else %}
+                                                Free Event
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </li>
+                                    <li class="mb-3 d-flex align-items-center">
+                                        <i class="fa fa-flag teal-text me-3 fs-5"></i>
+                                        <div>
+                                            <strong class="d-block">Status</strong>
+                                            <span class="text-muted">{{ event.get_status_display }}</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Description -->
+                <div class="event-description-card card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0"><i class="fa fa-align-left teal-text me-2"></i>About This Event</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="event-description">
+                            <p class="mb-0 fs-6">{{ event.description|linebreaks }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Status -->
+                <div class="event-status-card card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0"><i class="fa fa-calendar-check teal-text me-2"></i>Event Status</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if event.is_full %}
+                        <div class="alert alert-warning border-0">
+                            <div class="d-flex align-items-center">
+                                <i class="fa fa-exclamation-triangle fa-2x me-3 text-warning"></i>
+                                <div>
+                                    <h5 class="alert-heading mb-1">Event Full</h5>
+                                    <p class="mb-0">This event has reached maximum capacity. Please check back for future events.</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% elif not event.is_upcoming %}
+                        <div class="alert alert-info border-0">
+                            <div class="d-flex align-items-center">
+                                <i class="fa fa-info-circle fa-2x me-3 text-info"></i>
+                                <div>
+                                    <h5 class="alert-heading mb-1">Event Ended</h5>
+                                    <p class="mb-0">Registration is closed for this event. Thank you for your interest.</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-success border-0">
+                            <div class="d-flex align-items-center">
+                                <i class="fa fa-check-circle fa-2x me-3 text-success"></i>
+                                <div>
+                                    <h5 class="alert-heading mb-1">Event Available</h5>
+                                    <p class="mb-0">
+                                        {% if event.max_attendees > 0 %}
+                                        {{ event.max_attendees|add:"-event.current_attendees" }} spots remaining
+                                        {% else %}
+                                        Registration open - unlimited spots available
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar - Registration -->
+            <div class="col-lg-3">
+                <div class="registration-widget card border-0 shadow-sm sticky-top" style="top: 20px;">
+                    <div class="card-header teal-bg text-white py-3">
+                        <h5 class="mb-0 text-center"><i class="fa fa-ticket-alt me-2"></i>Event Registration</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if event.is_full %}
+                        <div class="alert alert-warning text-center">
+                            <i class="fa fa-exclamation-triangle fa-2x mb-2 text-warning"></i>
+                            <h6 class="alert-heading">Event Full</h6>
+                            <p class="mb-0 small">This event has reached maximum capacity.</p>
+                        </div>
+                        {% elif not event.is_upcoming %}
+                        <div class="alert alert-info text-center">
+                            <i class="fa fa-info-circle fa-2x mb-2 text-info"></i>
+                            <h6 class="alert-heading">Event Ended</h6>
+                            <p class="mb-0 small">Registration is closed for this event.</p>
+                        </div>
+                        {% else %}
+                            {% if user.is_authenticated and user_registration %}
+                            <div class="alert alert-success text-center">
+                                <i class="fa fa-check-circle fa-2x mb-2 text-success"></i>
+                                <h6 class="alert-heading">Already Registered</h6>
+                                <p class="mb-3 small">You are registered for this event.</p>
+                                <a href="{% url 'my_event_registrations' %}" class="btn btn-outline-primary btn-sm w-100">
+                                    View My Registrations
+                                </a>
+                            </div>
+                            {% else %}
+                            <div class="text-center mb-4">
+                                {% if event.price > 0 %}
+                                <h4 class="teal-text mb-1">${{ event.price }}</h4>
+                                <p class="text-muted small mb-3">per person</p>
+                                {% else %}
+                                <h4 class="teal-text mb-1">Free</h4>
+                                <p class="text-muted small mb-3">No charge</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="registration-info mb-4 p-3 bg-light rounded">
+                                <h6 class="fw-semibold mb-3">Registration Info</h6>
+                                <div class="small text-muted">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Available Spots:</span>
+                                        <strong class="teal-text">
+                                            {% if event.max_attendees > 0 %}
+                                            {{ event.max_attendees|add:"-event.current_attendees" }}
+                                            {% else %}
+                                            Unlimited
+                                            {% endif %}
+                                        </strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Date:</span>
+                                        <strong>{{ event.start_date|date:"M d, Y" }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Time:</span>
+                                        <strong>{{ event.start_date|date:"H:i" }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a href="{% url 'register_for_event' event.id %}" class="btn teal-btn w-100 py-2 fw-semibold">
+                                <i class="fa fa-ticket-alt me-2"></i> Register Now
+                            </a>
+
+                            <div class="mt-3 text-center">
+                                <small class="text-muted">
+                                    <i class="fa fa-info-circle me-1"></i>
+                                    Instant confirmation for free events
+                                </small>
+                            </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Event Details -->
+
+<style>
+/* Teal Color Theme */
+.teal-text {
+    color: #008080 !important;
+}
+
+.teal-btn {
+    background-color: #008080 !important;
+    border-color: #008080 !important;
+    color: white !important;
+    transition: all 0.3s ease;
+}
+
+.teal-btn:hover {
+    background-color: #006666 !important;
+    border-color: #006666 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 128, 128, 0.3);
+}
+
+.teal-bg {
+    background-color: #008080 !important;
+}
+
+/* Layout Styles */
+.event-details-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.container-fluid {
+    padding: 0 30px;
+}
+
+/* Card Styles */
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+/* Event Gallery Styles */
+.event-gallery {
+    margin-bottom: 2rem;
+}
+
+.event-gallery .main-image {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Other Events Styles */
+.other-events-card {
+    position: sticky;
+    top: 20px;
+}
+
+.other-event-item {
+    text-align: center;
+}
+
+/* Registration Widget Styles */
+.registration-widget {
+    border-radius: 15px;
+}
+
+.registration-info {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 1px solid #e9ecef;
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+/* Responsive Design */
+@media (max-width: 1199px) {
+    .container-fluid {
+        padding: 0 15px;
+    }
+
+    .col-lg-2 {
+        display: none;
+    }
+
+    .col-lg-7 {
+        flex: 0 0 66.666667%;
+        max-width: 66.666667%;
+    }
+
+    .col-lg-3 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0 10px;
+    }
+
+    .col-lg-7,
+    .col-lg-3 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .registration-widget {
+        margin-top: 2rem;
+    }
+}
+</style>
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}

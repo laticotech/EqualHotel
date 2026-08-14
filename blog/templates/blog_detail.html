@@ -1,0 +1,243 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }} - {{ hotel.name }} Blog{% endblock %}
+{% block meta_description %}{{ post.meta_description|default:post.excerpt }}{% endblock %}
+
+{% block content %}
+
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>BLOG POST</h1>
+                <p>Latest news and insights from {{ hotel.name }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Blog Detail -->
+<div class="blog-detail-box">
+    <div class="container">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <article class="blog-article">
+                    <!-- Breadcrumb -->
+                    <nav aria-label="breadcrumb" class="mb-4">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'blog_list' %}">Blog</a></li>
+                            {% if post.category %}
+                            <!-- FIXED: Changed category.slug to post.category.slug -->
+                            <li class="breadcrumb-item"><a href="{% url 'blog_category' post.category.slug %}">{{ post.category.name }}</a></li>
+                            {% endif %}
+                            <li class="breadcrumb-item active">{{ post.title|truncatewords:5 }}</li>
+                        </ol>
+                    </nav>
+
+                    <!-- Featured Image -->
+                    <div class="blog-featured-image mb-4">
+                        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="img-fluid rounded w-100" style="max-height: 400px; object-fit: cover;">
+                    </div>
+
+                    <!-- Article Header -->
+                    <header class="blog-header mb-4">
+                        {% if post.category %}
+                        <span class="category-badge">{{ post.category.name }}</span>
+                        {% endif %}
+                        <h1 class="blog-title mb-3">{{ post.title }}</h1>
+                        <div class="blog-meta text-muted mb-3">
+                            <span class="me-3">
+                                <i class="fas fa-user me-1"></i>By {{ post.author }}
+                            </span>
+                            <span class="me-3">
+                                <i class="fas fa-calendar me-1"></i>{{ post.published_date|date:"F d, Y" }}
+                            </span>
+                            {% if post.tags %}
+                            <span>
+                                <i class="fas fa-tags me-1"></i>{{ post.tags }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </header>
+
+                    <!-- Article Content -->
+                    <div class="blog-content">
+                        {{ post.content|safe }}
+                    </div>
+
+                    <!-- Share Buttons -->
+                    <div class="share-section mt-5 pt-4 border-top">
+                        <h5 class="mb-3">Share this post:</h5>
+                        <div class="share-buttons">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+                               target="_blank" class="btn btn-outline-primary btn-sm me-2">
+                                <i class="fab fa-facebook me-1"></i>Facebook
+                            </a>
+                            <a href="https://twitter.com/intent/tweet?text={{ post.title }}&url={{ request.build_absolute_uri }}"
+                               target="_blank" class="btn btn-outline-info btn-sm me-2">
+                                <i class="fab fa-twitter me-1"></i>Twitter
+                            </a>
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}"
+                               target="_blank" class="btn btn-outline-primary btn-sm">
+                                <i class="fab fa-linkedin me-1"></i>LinkedIn
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Related Posts -->
+                {% if related_posts %}
+                <section class="related-posts mt-5 pt-4 border-top">
+                    <h3 class="mb-4">Related Posts</h3>
+                    <div class="row">
+                        {% for related_post in related_posts %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-0 shadow-sm h-100">
+                                <img src="{{ related_post.featured_image.url }}" class="card-img-top" alt="{{ related_post.title }}" style="height: 120px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <a href="{% url 'blog_detail' related_post.slug %}" class="text-dark text-decoration-none">
+                                            {{ related_post.title|truncatewords:6 }}
+                                        </a>
+                                    </h6>
+                                    <small class="text-muted">{{ related_post.published_date|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Categories Widget -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-teal text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-folder me-2"></i>Categories
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <!-- FIXED: Removed namespace -->
+                                <a href="{% url 'blog_list' %}" class="text-decoration-none d-flex justify-content-between align-items-center">
+                                    <span>All Categories</span>
+                                </a>
+                            </li>
+                            {% for category in categories %}
+                            <li class="mb-2">
+                                <!-- FIXED: Removed namespace -->
+                                <a href="{% url 'blog_category' category.slug %}" class="text-decoration-none d-flex justify-content-between align-items-center">
+                                    <span>{{ category.name }}</span>
+                                    <span class="badge bg-light text-dark">{{ category.blogpost_set.count }}</span>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Recent Posts Widget -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-teal text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-clock me-2"></i>Recent Posts
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% for recent_post in recent_posts %}
+                        <div class="recent-post mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <h6 class="mb-1">
+                                <!-- FIXED: Removed namespace -->
+                                <a href="{% url 'blog_detail' recent_post.slug %}" class="text-decoration-none">
+                                    {{ recent_post.title }}
+                                </a>
+                            </h6>
+                            <small class="text-muted">{{ recent_post.published_date|date:"M d, Y" }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Blog Detail -->
+
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.blog-detail-box {
+    padding: 50px 0;
+}
+
+.blog-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.2;
+}
+
+.blog-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #555;
+}
+
+.blog-content h2, .blog-content h3, .blog-content h4 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.blog-content p {
+    margin-bottom: 1.5rem;
+}
+
+.blog-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+}
+
+.category-badge {
+    background: #008080;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+.share-buttons .btn {
+    border-radius: 20px;
+}
+
+.bg-teal {
+    background-color: #008080 !important;
+}
+
+@media (max-width: 768px) {
+    .blog-title {
+        font-size: 2rem;
+    }
+    
+    .blog-content {
+        font-size: 1rem;
+    }
+}
+</style>
+{% endblock %}

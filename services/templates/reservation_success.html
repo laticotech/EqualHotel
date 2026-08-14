@@ -1,0 +1,109 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}Reservation Confirmed - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<style>
+    /* Service Styles */
+.service-card {
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 128, 128, 0.1);
+}
+
+.btn-outline-teal {
+    border-color: #008080;
+    color: #008080;
+}
+
+.btn-outline-teal:hover {
+    background-color: #008080;
+    border-color: #008080;
+    color: white;
+}
+
+.teal-bg {
+    background-color: #008080 !important;
+}
+
+.success-icon {
+    animation: bounceIn 0.6s ease;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+</style>
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>RESERVATION CONFIRMED</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Success Message -->
+<div class="success-message py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body p-5">
+                        <div class="success-icon mb-4">
+                            <i class="fas fa-check-circle fa-5x text-success"></i>
+                        </div>
+                        <h2 class="card-title mb-3">Reservation Confirmed!</h2>
+                        <p class="lead mb-4">Thank you for your reservation. We're looking forward to serving you.</p>
+                        
+                        <div class="reservation-details mb-4 p-4 bg-light rounded">
+                            <h5 class="teal-text mb-3">Reservation Details</h5>
+                            <div class="row text-start">
+                                <div class="col-md-6">
+                                    <p><strong>Reservation Number:</strong><br>{{ reservation.reservation_number }}</p>
+                                    <p><strong>Service:</strong><br>{{ reservation.service.name }}</p>
+                                    <p><strong>Date:</strong><br>{{ reservation.reservation_date }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Time:</strong><br>{{ reservation.reservation_time }}</p>
+                                    <p><strong>Guests:</strong><br>{{ reservation.number_of_guests }}</p>
+                                    <p><strong>Status:</strong><br><span class="badge bg-info">{{ reservation.get_status_display }}</span></p>
+                                </div>
+                            </div>
+                            {% if reservation.special_requests %}
+                            <p class="text-start"><strong>Special Requests:</strong><br>{{ reservation.special_requests }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <p class="text-muted mb-4">
+                            A confirmation email has been sent to <strong>{{ reservation.guest_email }}</strong>
+                        </p>
+                        
+                        <div class="action-buttons">
+                            <a href="{% url 'service_list' %}" class="btn teal-btn me-3">
+                                <i class="fas fa-list me-2"></i> View More Services
+                            </a>
+                            <a href="{% url 'index' %}" class="btn btn-outline-teal">
+                                <i class="fas fa-home me-2"></i> Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Success Message -->
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}

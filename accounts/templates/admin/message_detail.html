@@ -1,0 +1,159 @@
+{% extends 'admin/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Message Details - {{ message.subject }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Message Details</h1>
+        <div class="d-none d-sm-inline-block">
+            <a href="{% url 'admin_messages' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to Messages
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Message Content -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-warning">Message Information</h6>
+                    <div>
+                        <span class="badge bg-{% if message.is_resolved %}success{% else %}warning{% endif %} me-2">
+                            {% if message.is_resolved %}Resolved{% else %}Unresolved{% endif %}
+                        </span>
+                        <span class="badge bg-info">{{ message.get_inquiry_type_display }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">From</h6>
+                            <p class="mb-1">{{ message.name }}</p>
+                            <p class="mb-1">{{ message.email }}</p>
+                            {% if message.phone %}
+                            <p class="mb-1">{{ message.phone }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Message Details</h6>
+                            <p class="mb-1"><strong>Subject:</strong> {{ message.subject }}</p>
+                            <p class="mb-1"><strong>Received:</strong> {{ message.created_at|date:"M d, Y H:i" }}</p>
+                            <p class="mb-0"><strong>Type:</strong> {{ message.get_inquiry_type_display }}</p>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold">Message Content</h6>
+                    <div class="alert alert-light border">
+                        {{ message.message|linebreaks }}
+                    </div>
+
+                    {% if message.is_resolved and message.resolved_notes %}
+                    <h6 class="fw-bold mt-4">Resolution Notes</h6>
+                    <div class="alert alert-success">
+                        {{ message.resolved_notes|linebreaks }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Sidebar -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if not message.is_resolved %}
+                        <!-- Mark as Resolved -->
+                        <div class="mb-3">
+                            <label for="resolved_notes" class="form-label">Resolution Notes</label>
+                            <textarea name="resolved_notes" id="resolved_notes" class="form-control" rows="4" 
+                                      placeholder="Add notes about how this was resolved..."></textarea>
+                        </div>
+                        <button type="submit" name="mark_resolved" class="btn btn-success w-100 mb-2">
+                            <i class="fas fa-check me-1"></i> Mark as Resolved
+                        </button>
+                        {% else %}
+                        <!-- Mark as Unresolved -->
+                        <button type="submit" name="mark_unresolved" class="btn btn-warning w-100 mb-2">
+                            <i class="fas fa-undo me-1"></i> Mark as Unresolved
+                        </button>
+                        {% endif %}
+                    </form>
+
+                    <!-- Contact Information -->
+                    <hr class="my-4">
+                    <h6 class="fw-bold">Contact Information</h6>
+                    <div class="small">
+                        <p class="mb-1"><strong>Email:</strong> {{ message.email }}</p>
+                        {% if message.phone %}
+                        <p class="mb-1"><strong>Phone:</strong> {{ message.phone }}</p>
+                        {% endif %}
+                        <p class="mb-0"><strong>Received:</strong> {{ message.created_at|date:"M d, Y" }}</p>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <hr class="my-4">
+                    <h6 class="fw-bold">Quick Actions</h6>
+                    <div class="d-grid gap-2">
+                        <a href="mailto:{{ message.email }}?subject=Re: {{ message.subject }}" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-reply me-1"></i> Reply via Email
+                        </a>
+                        {% if message.phone %}
+                        <a href="tel:{{ message.phone }}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-phone me-1"></i> Call Customer
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Statistics -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">Message Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="small">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Inquiry Type:</span>
+                            <span>{{ message.get_inquiry_type_display }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Status:</span>
+                            <span>
+                                {% if message.is_resolved %}
+                                <span class="text-success">Resolved</span>
+                                {% else %}
+                                <span class="text-warning">Unresolved</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Received:</span>
+                            <span>{{ message.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Time:</span>
+                            <span>{{ message.created_at|time:"H:i" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Days Ago:</span>
+                            <span>{{ message.created_at|timesince }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

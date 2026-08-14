@@ -1,0 +1,243 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}Sign Up - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>SIGN UP</h1>
+                <p>Create your account</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-teal text-white text-center py-3">
+                    <h4 class="mb-0">Create Account</h4>
+                </div>
+                <div class="card-body p-4">
+                    {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_first_name" class="form-label">First Name</label>
+                                <input type="text" name="first_name" class="form-control" id="id_first_name"
+                                       value="{{ form.first_name.value|default:'' }}"
+                                       placeholder="Enter your first name">
+                                {% if form.first_name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.first_name.errors %}
+                                    <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_last_name" class="form-label">Last Name</label>
+                                <input type="text" name="last_name" class="form-control" id="id_last_name"
+                                       value="{{ form.last_name.value|default:'' }}"
+                                       placeholder="Enter your last name">
+                                {% if form.last_name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.last_name.errors %}
+                                    <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label">Username</label>
+                            <input type="text" name="username" class="form-control" id="id_username"
+                                   value="{{ form.username.value|default:'' }}"
+                                   placeholder="Choose a username">
+                            {% if form.username.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.username.errors %}
+                                <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if form.username.help_text %}
+                            <div class="form-text">{{ form.username.help_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_email" class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" id="id_email"
+                                   value="{{ form.email.value|default:'' }}"
+                                   placeholder="Enter your email address">
+                            {% if form.email.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.email.errors %}
+                                <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_phone" class="form-label">Phone</label>
+                            <input type="tel" name="phone" class="form-control" id="id_phone"
+                                   value="{{ form.phone.value|default:'' }}"
+                                   placeholder="Enter your phone number">
+                            {% if form.phone.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.phone.errors %}
+                                <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_address" class="form-label">Address</label>
+                            <textarea name="address" class="form-control" id="id_address"
+                                      rows="3" placeholder="Enter your address">{{ form.address.value|default:'' }}</textarea>
+                            {% if form.address.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.address.errors %}
+                                <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_password1" class="form-label">Password</label>
+                            <input type="password" name="password1" class="form-control" id="id_password1"
+                                   placeholder="Create a password">
+                            {% if form.password1.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.password1.errors %}
+                                <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if form.password1.help_text %}
+                            <div class="form-text">{{ form.password1.help_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_password2" class="form-label">Confirm Password</label>
+                            <input type="password" name="password2" class="form-control" id="id_password2"
+                                   placeholder="Confirm your password">
+                            {% if form.password2.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.password2.errors %}
+                                <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if form.password2.help_text %}
+                            <div class="form-text">{{ form.password2.help_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-teal btn-lg">Create Account</button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <p>Already have an account? <a href="{% url 'login' %}" class="text-primary"> Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-control {
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #008080;
+    box-shadow: 0 0 0 0.2rem rgba(0, 128, 128, 0.25);
+}
+
+.btn-teal {
+    background: #008080;
+    border-color: #008080;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-teal:hover {
+    background: #006666;
+    border-color: #006666;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.text-teal {
+    color: #008080;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.text-teal:hover {
+    color: #006666;
+}
+
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.card-header {
+    border-bottom: none;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+</style>
+{% endblock %}

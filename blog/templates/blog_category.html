@@ -1,0 +1,25 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} - {{ hotel.name }} Blog{% endblock %}
+
+{% block content %}
+
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>{{ category.name }}</h1>
+                <p>{{ category.description|default:"Blog posts in this category" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Use the same blog_list.html template structure but with category context -->
+{% include 'blog/blog_list.html' %}
+
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}

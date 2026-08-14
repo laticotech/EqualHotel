@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>{% extends 'admin/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Contact Messages - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Contact Messages</h1>
+        <div class="d-none d-sm-inline-block">
+            <span class="badge bg-warning">{{ messages.paginator.count }} total messages</span>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-warning">Filters</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="resolved" class="form-label">Status</label>
+                    <select name="resolved" id="resolved" class="form-select">
+                        <option value="">All Messages</option>
+                        <option value="unresolved" {% if resolved_filter == 'unresolved' %}selected{% endif %}>Unresolved Only</option>
+                        <option value="resolved" {% if resolved_filter == 'resolved' %}selected{% endif %}>Resolved Only</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="type" class="form-label">Inquiry Type</label>
+                    <select name="type" id="type" class="form-select">
+                        <option value="">All Types</option>
+                        {% for type_code, type_name in inquiry_types %}
+                        <option value="{{ type_code }}" {% if type_filter == type_code %}selected{% endif %}>
+                            {{ type_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <div>
+                        <button type="submit" class="btn btn-warning">Apply Filters</button>
+                        <a href="{% url 'admin_messages' %}" class="btn btn-secondary">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Messages List -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-warning">All Messages</h6>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+            <div class="list-group">
+                {% for message in messages %}
+                <a href="{% url 'admin_message_detail' message.id %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0 fw-bold">{{ message.name }}</h6>
+                                <div>
+                                    <span class="badge bg-{% if message.is_resolved %}success{% else %}warning{% endif %} me-2">
+                                        {% if message.is_resolved %}Resolved{% else %}Unresolved{% endif %}
+                                    </span>
+                                    <span class="badge bg-info">{{ message.get_inquiry_type_display }}</span>
+                                </div>
+                            </div>
+                            <p class="mb-1 fw-bold text-dark">{{ message.subject }}</p>
+                            <p class="mb-1 text-muted">{{ message.message|truncatewords:30 }}</p>
+                            <small class="text-muted">{{ message.email }} • {{ message.phone|default:"No phone" }}</small>
+                        </div>
+                        <div class="text-end ms-3">
+                            <small class="text-muted d-block">{{ message.created_at|date:"M d, Y" }}</small>
+                            <small class="text-muted d-block">{{ message.created_at|time:"H:i" }}</small>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if messages.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if messages.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ messages.previous_page_number }}{% if resolved_filter %}&resolved={{ resolved_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in messages.paginator.page_range %}
+                    <li class="page-item {% if messages.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if resolved_filter %}&resolved={{ resolved_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if messages.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ messages.next_page_number }}{% if resolved_filter %}&resolved={{ resolved_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-envelope fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Messages Found</h4>
+                <p class="text-muted">No contact messages match your current filters.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+</head>
+<body>
+
+</body>
+</html>

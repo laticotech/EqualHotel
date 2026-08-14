@@ -1,0 +1,187 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}Reserve {{ service.name }} - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<style>
+    /* Service Styles */
+.service-card {
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 128, 128, 0.1);
+}
+
+.btn-outline-teal {
+    border-color: #008080;
+    color: #008080;
+}
+
+.btn-outline-teal:hover {
+    background-color: #008080;
+    border-color: #008080;
+    color: white;
+}
+
+.teal-bg {
+    background-color: #008080 !important;
+}
+
+.success-icon {
+    animation: bounceIn 0.6s ease;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+</style>
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>RESERVING - {{ service.name|upper }}</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Reservation Form -->
+<div class="reservation-form py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header teal-bg text-white">
+                        <h4 class="mb-0 text-center" style="color: white;">Service Reservation Form</h4>
+                    </div>
+                    <div class="card-body our-team p-4">
+                        <div class="service-info mb-4 p-3 bg-light rounded">
+                            <h5>{{ service.name }}</h5>
+                            {% if service.is_free %}
+                            <span class="badge bg-success">Free Service</span>
+                            {% else %}
+                            <span class="teal-text fw-bold">GHC {{ service.price }}</span>
+                            {% endif %}
+                            {% if service.available_days or service.available_times %}
+                            <p class="mb-0 small">
+                                {% if service.available_days %}{{ service.available_days }}{% endif %}
+                                {% if service.available_times %}{{ service.available_times }}{% endif %}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        {% if messages %}
+                        <div class="messages mb-4">
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="guest_name" class="form-label">Full Name *</label>
+                                        <input type="text" class="form-control" id="guest_name" name="guest_name"
+                                               value="{% if user.is_authenticated %}{{ user.first_name }} {{ user.last_name }}{% endif %}"
+                                               required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="guest_email" class="form-label">Email Address *</label>
+                                        <input type="email" class="form-control" id="guest_email" name="guest_email"
+                                               value="{% if user.is_authenticated %}{{ user.email }}{% endif %}"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="guest_phone" class="form-label">Phone Number *</label>
+                                        <input type="tel" class="form-control" id="guest_phone" name="guest_phone"
+                                               value="{% if user.is_authenticated and user.profile %}{{ user.profile.phone }}{% endif %}"
+                                               required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="number_of_guests" class="form-label">Number of Guests</label>
+                                        <select class="form-select" id="number_of_guests" name="number_of_guests">
+                                            {% for i in "123456789" %}
+                                            <option value="{{ forloop.counter }}" {% if forloop.counter == 1 %}selected{% endif %}>
+                                                {{ forloop.counter }} guest{{ forloop.counter|pluralize }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="reservation_date" class="form-label">Reservation Date *</label>
+                                        <input type="date" class="form-control" id="reservation_date" name="reservation_date" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="reservation_time" class="form-label">Reservation Time *</label>
+                                        <input type="time" class="form-control" id="reservation_time" name="reservation_time" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="special_requests" class="form-label">Special Requests</label>
+                                <textarea class="form-control" id="special_requests" name="special_requests" rows="4" placeholder="Any special requirements or additional information..."></textarea>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-teal btn-lg">
+                                    <i class="fas fa-calendar-check me-2"></i> Submit Reservation
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Reservation Form -->
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('reservation_date').min = today;
+
+    // Set default time to next available hour
+    const now = new Date();
+    const nextHour = new Date(now.getTime() + 60 * 60 * 1000);
+    const timeString = nextHour.getHours().toString().padStart(2, '0') + ':00';
+    document.getElementById('reservation_time').value = timeString;
+});
+</script>
+{% endblock %}

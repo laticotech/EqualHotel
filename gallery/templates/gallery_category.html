@@ -1,0 +1,255 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} - Gallery{% endblock %}
+
+{% block content %}
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>{{ category.name|upper }}</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Gallery -->
+<div class="gallery-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="heading-title text-center">
+                    <h2>{{ category.name }}</h2>
+                    {% if category.description %}
+                    <p>{{ category.description }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Breadcrumb Navigation -->
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'gallery_list' %}">Gallery</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="tz-gallery">
+            <div class="row">
+                {% for image in images %}
+                <div class="col-sm-12 col-md-6 col-lg-4 mb-4">
+                    <div class="gallery-item-container">
+                        <a class="lightbox" href="{{ image.image.url }}"
+                           data-lightbox="gallery-{{ category.id }}"
+                           data-title="{% if image.title %}{{ image.title }}{% endif %}{% if image.description %} - {{ image.description }}{% endif %}">
+                            <img class="img-fluid" src="{{ image.image.url }}"
+                                 alt="{{ image.title|default:category.name }}"
+                                 style="height: 250px; width: 100%; object-fit: cover;">
+                        </a>
+                        <div class="blog-detail mt-3">
+                            {% if image.title %}
+                            <center><h4>{{ image.title }}</h4></center>
+                            {% endif %}
+                            {% if image.description %}
+                            <center><h6>{{ image.description|safe }}</h6></center>
+                            {% endif %}
+                            <div class="text-center mt-2">
+                                <small class="text-muted">
+                                    <i class="far fa-calendar-alt me-1"></i>
+                                    {{ image.uploaded_at|date:"M d, Y" }}
+                                </small>
+                                {% if image.is_featured %}
+                                <span class="badge bg-warning text-dark ms-2">
+                                    <i class="fas fa-star me-1"></i>Featured
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No images found in this category</h4>
+                        <p class="text-muted">Check back later for new additions to our gallery.</p>
+                        <a href="{% url 'gallery_list' %}" class="btn btn-primary mt-3">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Gallery
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        {% if images.has_other_pages %}
+        <div class="row mt-5">
+            <div class="col-lg-12">
+                <nav aria-label="Gallery pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if images.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ images.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&laquo;</span>
+                        </li>
+                        {% endif %}
+
+                        {% for num in images.paginator.page_range %}
+                            {% if images.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% elif num > images.number|add:'-3' and num < images.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if images.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ images.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&raquo;</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+
+                <!-- Page Info -->
+                <div class="text-center text-muted mt-2">
+                    <small>
+                        Page {{ images.number }} of {{ images.paginator.num_pages }}
+                        ({{ images.paginator.count }} total images)
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Back to Gallery -->
+        <div class="row mt-4">
+            <div class="col-lg-12 text-center">
+                <a href="{% url 'gallery_list' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to All Categories
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Gallery -->
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.gallery-item-container {
+    transition: transform 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.gallery-item-container:hover {
+    transform: translateY(-5px);
+}
+
+.tz-gallery .lightbox img {
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+}
+
+.tz-gallery .lightbox:hover img {
+    transform: scale(1.02);
+}
+
+.breadcrumb {
+    background: transparent;
+    margin-bottom: 0;
+}
+
+.breadcrumb-item a {
+    color: #666;
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    color: #d65106;
+}
+
+.breadcrumb-item.active {
+    color: #d65106;
+}
+
+.page-item.active .page-link {
+    background-color: #d65106;
+    border-color: #d65106;
+}
+
+.page-link {
+    color: #d65106;
+}
+
+.page-link:hover {
+    color: #b54505;
+}
+
+.btn-outline-primary {
+    color: #d65106;
+    border-color: #d65106;
+}
+
+.btn-outline-primary:hover {
+    background-color: #d65106;
+    border-color: #d65106;
+    color: white;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Lightbox Integration -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+
+<script>
+// Initialize lightbox
+document.addEventListener('DOMContentLoaded', function() {
+    lightbox.option({
+        'resizeDuration': 200,
+        'wrapAround': true,
+        'imageFadeDuration': 300,
+        'positionFromTop': 100,
+        'albumLabel': 'Image %1 of %2'
+    });
+
+    // Add smooth scrolling for pagination links
+    document.querySelectorAll('.page-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (this.getAttribute('href').includes('page=')) {
+                e.preventDefault();
+                const url = this.getAttribute('href');
+                window.location.href = url;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

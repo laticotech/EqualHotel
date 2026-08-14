@@ -1,0 +1,434 @@
+{% extends 'homebase.html' %}
+{% load static %}
+{% load embed_video_tags %}
+
+{% block title %}About Us - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+
+<!-- Start header -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>About Us</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End header -->
+
+<!-- Start About Section -->
+<div class="about-section-box">
+    <div class="container">
+        <div class="row">
+            <!-- Hotel Information -->
+            <div class="col-lg-6 col-md-6">
+                <div class="inner-column">
+                    <h1><span>{{ hotel.name }}</span></h1>
+                    {% if hotel.tagline %}
+                    <h4 class="text-teal">{{ hotel.tagline }}</h4>
+                    {% endif %}
+                    
+                    {% if hotel.about %}
+                    <div class="about-content mb-4">
+                        {{ hotel.about|safe }}
+                    </div>
+                    {% else %}
+                    <div class="about-content mb-4">
+                        <p>{{ hotel.description }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Hotel Details -->
+                    <div class="hotel-details mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="detail-item mb-3">
+                                    <strong><i class="fas fa-clock text-teal me-2"></i>Check-in:</strong>
+                                    {{ hotel.check_in_time|time:"g:i A" }}
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <strong><i class="fas fa-phone text-teal me-2"></i>Phone:</strong>
+                                    {{ hotel.phone }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-item mb-3">
+                                    <strong><i class="fas fa-clock text-teal me-2"></i>Check-out:</strong>
+                                    {{ hotel.check_out_time|time:"g:i A" }}
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <strong><i class="fas fa-envelope text-teal me-2"></i>Email:</strong>
+                                    {{ hotel.email }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Video Section -->
+            <div class="col-lg-6 col-md-6">
+                <div class="inner-column">
+                     <h1><span>Watch our story</span></h1>
+                </div>
+
+                {% if hotel.about_video %}
+                <div class="video-container">
+                    <div class="video-wrapper">
+                        {% video hotel.about_video '100%x400' %}
+                    </div>
+                    <p class="text-center text-muted mt-2">Watch our story</p>
+                </div>
+                {% else %}
+                <div class="placeholder-video">
+                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 400px;">
+                        <div>
+                            <i class="fas fa-video fa-4x text-muted mb-3"></i>
+                            <p class="text-muted">Video coming soon</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="action-buttons">
+                    <a class="btn btn-circle btn-outline-teal me-3" href="/services">
+                        <i class="fas fa-calendar-check me-2"></i>Make Reservation
+                    </a>
+                    <a class="btn btn-circle btn-outline-teal" href="/accommodations">
+                        <i class="fas fa-bed me-2"></i>Book Rooms
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End About Section -->
+
+<!-- Start Policies Section -->
+<div class="policies-section">  <!-- Reduced padding -->
+    <div class="container">
+        <div class="row">
+            <!-- Cancellation Policy -->
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-teal text-white py-3">  <!-- Added padding -->
+                        <h4 class="card-title mb-0 fs-5" style="color: teal">  <!-- Added font size -->
+                            <i class="fas fa-calendar-times me-2"></i>Cancellation Policy
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% if hotel.cancellation_policy %}
+                            <div class="policy-content">
+                                {{ hotel.cancellation_policy|linebreaks }}
+                            </div>
+                        {% else %}
+                            <p class="text-muted text-center py-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Cancellation policy information will be available soon.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pet Policy -->
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-teal text-white py-3">  <!-- Added padding -->
+                        <h4 class="card-title mb-0 fs-5" style="color: teal;">  <!-- Added font size -->
+                            <i class="fas fa-paw me-2"></i>Pet Policy
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% if hotel.pet_policy %}
+                            <div class="policy-content">
+                                {{ hotel.pet_policy|linebreaks }}
+                            </div>
+                        {% else %}
+                            <p class="text-muted text-center py-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Pet policy information will be available soon.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Policies Section -->
+
+<!-- Start Hotel Features -->
+<div class="features-section py-4">  <!-- Reduced padding -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="heading-title text-center">
+                    <h2>Why Choose {{ hotel.name }}</h2>
+                    <p>Experience the difference with our exceptional services</p>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-4 text-center mb-4">
+                <div class="feature-item">
+                    <i class="fas fa-concierge-bell fa-3x text-teal mb-3"></i>
+                    <h5>Premium Service</h5>
+                    <p class="text-muted">Experience world-class hospitality with our dedicated staff</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="feature-item">
+                    <i class="fas fa-utensils fa-3x text-teal mb-3"></i>
+                    <h5>Fine Dining</h5>
+                    <p class="text-muted">Savor exquisite cuisine prepared by our expert chefs</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="feature-item">
+                    <i class="fas fa-spa fa-3x text-teal mb-3"></i>
+                    <h5>Luxury Comfort</h5>
+                    <p class="text-muted">Relax in our beautifully appointed rooms and suites</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Hotel Features -->
+
+<!-- Start Contact info -->
+<div class="contact-imfo-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 arrow-right">
+                <i class="fa fa-volume-control-phone"></i>
+                <div class="overflow-hidden">
+                    <h4>Phone</h4>
+                    <p class="lead">
+                        {{ hotel.phone }}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 arrow-right">
+                <i class="fa fa-envelope"></i>
+                <div class="overflow-hidden">
+                    <h4>Email</h4>
+                    <p class="lead">
+                        {{ hotel.email }}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <i class="fa fa-map-marker"></i>
+                <div class="overflow-hidden">
+                    <h4>Location</h4>
+                    <p class="lead">
+                        {{ hotel.address|linebreaksbr }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Contact info -->
+
+{% endblock %}
+
+{% block foot %}
+    {% include 'footer.html' %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.about-section-box {
+    padding: 70px 0 40px 0;  /* Reduced bottom padding */
+    background: #ffffff;
+}
+
+.inner-column h1 {
+    font-family: 'Rubik', sans-serif;
+    font-size: 30px;
+    color: #010101;
+    font-weight: 500;
+}
+
+.inner-column h1 span {
+    color: #008080;
+}
+
+.about-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #555;
+}
+
+.hotel-details {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #008080;
+    margin-bottom: 25px;  /* Reduced margin */
+}
+
+.detail-item {
+    font-size: 15px;
+    color: #333;
+}
+
+.policies-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding-top: 30px !important;  /* Reduced top padding */
+    padding-bottom: 30px !important;  /* Reduced bottom padding */
+}
+
+.bg-teal {
+    background-color: #008080 !important;
+}
+
+.card-header.bg-teal {
+    border-bottom: none;
+    padding: 15px 20px !important;  /* Ensure padding is applied */
+}
+
+.card-header.bg-teal h4 {
+    color: white !important;  /* Force white text */
+    font-weight: 600;
+    font-size: 1.1rem !important;
+}
+
+.policy-content {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #555;
+}
+
+.features-section {
+    background: #ffffff;
+    padding-top: 40px !important;  /* Reduced padding */
+    padding-bottom: 40px !important;  /* Reduced padding */
+}
+
+.feature-item {
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+
+.feature-item:hover {
+    transform: translateY(-5px);
+}
+
+.feature-item h5 {
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.video-container {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 0;  /* Remove bottom margin */
+}
+
+.video-wrapper {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.placeholder-video {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 0;  /* Remove bottom margin */
+}
+
+.btn-outline-new-white {
+    color: #fff;
+    background-color: #008080;
+    border-color: #008080;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-top: 15px;  /* Reduced top margin */
+    display: inline-block;
+}
+
+.btn-outline-new-white:hover {
+    background-color: #006666;
+    border-color: #006666;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.heading-title h2 {
+    color: #010101;
+    font-size: 28px;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 500;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 15px;
+}
+
+.heading-title h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: #008080;
+    border-radius: 2px;
+}
+
+.text-teal {
+    color: #008080 !important;
+}
+
+/* Ensure card titles are visible */
+.card-title {
+    color: inherit !important;
+}
+
+/* Fix for policy card headers */
+.card-header h4 {
+    margin: 0;
+    color: white !important;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .about-section-box {
+        padding: 50px 0 30px 0;
+    }
+
+    .hotel-details .row {
+        margin: 0 -10px;
+    }
+
+    .detail-item {
+        font-size: 14px;
+    }
+
+    .feature-item {
+        margin-bottom: 30px;
+    }
+
+    .policies-section {
+        padding-top: 20px !important;
+        padding-bottom: 20px !important;
+    }
+
+    .features-section {
+        padding-top: 30px !important;
+        padding-bottom: 30px !important;
+    }
+}
+
+</style>
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}

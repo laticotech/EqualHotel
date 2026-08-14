@@ -1,0 +1,248 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}Login - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>LOGIN</h1>
+                <p>Access your account</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm border-0 our-team">
+                <div class="card-header bg-teal text-white text-center py-3">
+                    <h4 class="mb-0">Welcome Back</h4>
+                </div>
+                <div class="card-body p-4">
+                    {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label fw-semibold">Username *</label>
+                            <input type="text"
+                                   name="{{ form.username.name }}"
+                                   class="form-control"
+                                   id="id_username"
+                                   value="{{ form.username.value|default:'' }}"
+                                   placeholder="Enter your username"
+                                   required>
+                            {% if form.username.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.username.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_password" class="form-label fw-semibold">Password *</label>
+                            <input type="password"
+                                   name="{{ form.password.name }}"
+                                   class="form-control"
+                                   id="id_password"
+                                   placeholder="Enter your password"
+                                   required>
+                            {% if form.password.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.password.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-teal btn-lg fw-semibold">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-2">Don't have an account?
+                            <a href="{% url 'signup' %}" class="text-success fw-semibold">Sign up here</a>
+                        </p>
+                        <p class="mb-0">
+                            <a href="#" class="text-muted">Forgot your password?</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.our-team {
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.our-team:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 128, 128, 0.2) !important;
+}
+
+.form-control {
+    border-radius: 10px;
+    padding: 14px;
+    border: 2px solid #e9ecef;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #008080;
+    box-shadow: 0 0 0 0.3rem rgba(0, 128, 128, 0.15);
+    transform: translateY(-2px);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+.btn-teal {
+    background: linear-gradient(135deg, #008080, #006666);
+    border-color: #008080;
+    color: white;
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-teal:hover {
+    background: linear-gradient(135deg, #006666, #004d4d);
+    border-color: #006666;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 128, 128, 0.3);
+}
+
+.text-teal {
+    color: #008080;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.text-teal:hover {
+    color: #006666;
+}
+
+.form-check-input:checked {
+    background-color: #008080;
+    border-color: #008080;
+}
+
+.form-check-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+.card-header {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+
+    .card-body {
+        padding: 1.5rem !important;
+    }
+
+    .btn-teal {
+        padding: 12px;
+        font-size: 1rem;
+    }
+}
+
+/* Loading animation for button */
+.btn-teal:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Placeholder styling */
+.form-control::placeholder {
+    color: #adb5bd;
+    font-size: 0.9rem;
+}
+
+/* Error state styling */
+.form-control.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.querySelector('form');
+    const submitBtn = loginForm.querySelector('button[type="submit"]');
+
+    loginForm.addEventListener('submit', function() {
+        // Add loading state to button
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Logging in...';
+    });
+
+    // Add focus effects to form inputs
+    const formInputs = document.querySelectorAll('.form-control');
+    formInputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+
+        input.addEventListener('blur', function() {
+            if (!this.value) {
+                this.parentElement.classList.remove('focused');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

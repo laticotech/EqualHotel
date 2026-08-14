@@ -1,0 +1,418 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}Notifications - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>NOTIFICATIONS</h1>
+                <p>Your bookings, reservations, and updates</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+           <!-- Notifications Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>
+        <i class="fas fa-bell text-teal me-2"></i>
+        My Notifications
+    </h3>
+    <div class="d-flex align-items-center">
+        <span class="badge bg-teal me-3">
+            {{ total_notifications }} active notification{{ total_notifications|pluralize }}
+        </span>
+        {% if has_new_notifications %}
+        <a href="{% url 'notifications' %}?mark_viewed=true" class="btn btn-outline-teal btn-sm">
+            <i class="fas fa-check-double me-1"></i>Mark All Viewed
+        </a>
+        {% else %}
+        <span class="badge bg-success">
+            <i class="fas fa-check me-1"></i>All Viewed
+        </span>
+        {% endif %}
+    </div>
+</div>
+
+            <!-- Pending Actions Section -->
+            <div class="row">
+                <!-- Pending Bookings -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-warning text-dark py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    Pending Bookings
+                                </h5>
+                                <span class="badge bg-dark">{{ pending_bookings.count }}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {% if pending_bookings %}
+                            <div class="list-group list-group-flush">
+                                {% for booking in pending_bookings %}
+                                <div class="list-group-item px-0 {% if not forloop.last %}border-bottom{% endif %}">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">
+                                                <a href="{% url 'booking_detail' booking.booking_reference %}" class="text-decoration-none">
+                                                    {{ booking.room.room_type }}
+                                                </a>
+                                            </h6>
+                                            <small class="text-muted">
+                                                {{ booking.check_in|date:"M d" }} - {{ booking.check_out|date:"M d, Y" }}
+                                            </small>
+                                            <div class="mt-1">
+                                                <span class="badge {% if booking.status == 'pending' %}bg-warning{% else %}bg-success{% endif %}">
+                                                    {{ booking.get_status_display }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-teal fw-bold">${{ booking.total_price }}</small>
+                                            <br>
+                                            <a href="{% url 'booking_detail' booking.booking_reference %}" class="btn btn-sm btn-outline-teal mt-1">
+                                                View
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-check-circle fa-2x text-success mb-3"></i>
+                                <p class="text-muted mb-0">No pending bookings</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Reservations -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-warning text-dark py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    Pending Reservations
+                                </h5>
+                                <span class="badge bg-dark">{{ pending_reservations.count }}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {% if pending_reservations %}
+                            <div class="list-group list-group-flush">
+                                {% for reservation in pending_reservations %}
+                                <div class="list-group-item px-0 {% if not forloop.last %}border-bottom{% endif %}">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">
+                                                <a href="{% url 'reservation_detail' reservation.reservation_number %}" class="text-decoration-none">
+                                                    {{ reservation.service.name }}
+                                                </a>
+                                            </h6>
+                                            <small class="text-muted">
+                                                {{ reservation.reservation_date|date:"M d, Y" }} at {{ reservation.reservation_time|time:"g:i A" }}
+                                            </small>
+                                            <div class="mt-1">
+                                                <span class="badge {% if reservation.status == 'pending' %}bg-warning{% else %}bg-success{% endif %}">
+                                                    {{ reservation.get_status_display }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-muted">{{ reservation.number_of_guests }} guest{{ reservation.number_of_guests|pluralize }}</small>
+                                            <br>
+                                            <a href="{% url 'reservation_detail' reservation.reservation_number %}" class="btn btn-sm btn-outline-teal mt-1">
+                                                View
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-check-circle fa-2x text-success mb-3"></i>
+                                <p class="text-muted mb-0">No pending reservations</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Section -->
+            <div class="row">
+                <!-- Upcoming Bookings -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-info text-white py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-calendar-alt me-2"></i>
+                                    Upcoming Stays (7 days)
+                                </h5>
+                                <span class="badge bg-light text-dark">{{ upcoming_bookings.count }}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {% if upcoming_bookings %}
+                            <div class="list-group list-group-flush">
+                                {% for booking in upcoming_bookings %}
+                                <div class="list-group-item px-0 {% if not forloop.last %}border-bottom{% endif %}">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">{{ booking.room.room_type }}</h6>
+                                            <small class="text-muted">
+                                                Check-in: {{ booking.check_in|date:"M d, Y" }}
+                                            </small>
+                                            <div class="mt-1">
+                                                <span class="badge bg-success">
+                                                    {{ booking.nights }} night{{ booking.nights|pluralize }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-teal fw-bold">${{ booking.total_price }}</small>
+                                            <br>
+                                            <a href="{% url 'booking_detail' booking.booking_reference %}" class="btn btn-sm btn-outline-teal mt-1">
+                                                Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-bed fa-2x text-muted mb-3"></i>
+                                <p class="text-muted mb-0">No upcoming stays</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Reservations -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-info text-white py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-clock me-2"></i>
+                                    Upcoming Services (3 days)
+                                </h5>
+                                <span class="badge bg-light text-dark">{{ upcoming_reservations.count }}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {% if upcoming_reservations %}
+                            <div class="list-group list-group-flush">
+                                {% for reservation in upcoming_reservations %}
+                                <div class="list-group-item px-0 {% if not forloop.last %}border-bottom{% endif %}">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">{{ reservation.service.name }}</h6>
+                                            <small class="text-muted">
+                                                {{ reservation.reservation_date|date:"M d, Y" }} at {{ reservation.reservation_time|time:"g:i A" }}
+                                            </small>
+                                            <div class="mt-1">
+                                                <span class="badge bg-primary">
+                                                    {{ reservation.service.category }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-muted">{{ reservation.number_of_guests }} guest{{ reservation.number_of_guests|pluralize }}</small>
+                                            <br>
+                                            <a href="{% url 'reservation_detail' reservation.reservation_number %}" class="btn btn-sm btn-outline-teal mt-1">
+                                                Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-concierge-bell fa-2x text-muted mb-3"></i>
+                                <p class="text-muted mb-0">No upcoming services</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity Section -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-light py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-history me-2"></i>
+                                    Recent Activity (30 days)
+                                </h5>
+                                <span class="badge bg-teal">{{ recent_bookings.count|add:recent_reservations.count }}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {% if recent_bookings or recent_reservations %}
+                            <div class="timeline">
+                                {% for booking in recent_bookings %}
+                                <div class="timeline-item mb-3">
+                                    <div class="d-flex">
+                                        <div class="timeline-icon bg-teal text-white rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-bed"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">
+                                                <a href="{% url 'booking_detail' booking.booking_reference %}" class="text-decoration-none">
+                                                    Booking {{ booking.booking_reference }}
+                                                </a>
+                                            </h6>
+                                            <p class="mb-1 text-muted">
+                                                {{ booking.room.room_type }} • 
+                                                {{ booking.check_in|date:"M d" }} - {{ booking.check_out|date:"M d, Y" }} • 
+                                                <span class="badge {% if booking.status == 'confirmed' %}bg-success{% elif booking.status == 'pending' %}bg-warning{% elif booking.status == 'cancelled' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                                    {{ booking.get_status_display }}
+                                                </span>
+                                            </p>
+                                            <small class="text-muted">{{ booking.created_at|date:"M d, Y g:i A" }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+
+                                {% for reservation in recent_reservations %}
+                                <div class="timeline-item mb-3">
+                                    <div class="d-flex">
+                                        <div class="timeline-icon bg-teal text-white rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-concierge-bell"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">
+                                                <a href="{% url 'reservation_detail' reservation.reservation_number %}" class="text-decoration-none">
+                                                    {{ reservation.service.name }}
+                                                </a>
+                                            </h6>
+                                            <p class="mb-1 text-muted">
+                                                {{ reservation.service.category }} • 
+                                                {{ reservation.reservation_date|date:"M d, Y" }} at {{ reservation.reservation_time|time:"g:i A" }} • 
+                                                <span class="badge {% if reservation.status == 'confirmed' %}bg-success{% elif reservation.status == 'pending' %}bg-warning{% elif reservation.status == 'cancelled' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                                    {{ reservation.get_status_display }}
+                                                </span>
+                                            </p>
+                                            <small class="text-muted">{{ reservation.created_at|date:"M d, Y g:i A" }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-inbox fa-2x text-muted mb-3"></i>
+                                <p class="text-muted mb-0">No recent activity</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="text-teal mb-3">Quick Actions</h5>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'my_bookings' %}" class="btn btn-outline-teal">
+                                    <i class="fas fa-bed me-2"></i>View All Bookings
+                                </a>
+                                <a href="{% url 'my_reservations' %}" class="btn btn-outline-teal">
+                                    <i class="fas fa-concierge-bell me-2"></i>View All Reservations
+                                </a>
+                                <a href="{% url 'create_reservation' %}" class="btn btn-teal">
+                                    <i class="fas fa-plus me-2"></i>New Service Reservation
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.timeline {
+    position: relative;
+}
+
+.timeline-item {
+    position: relative;
+}
+
+.timeline-item:before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 40px;
+    bottom: -25px;
+    width: 2px;
+    background-color: #e9ecef;
+}
+
+.timeline-item:last-child:before {
+    display: none;
+}
+
+.timeline-icon {
+    flex-shrink: 0;
+}
+
+.btn-outline-teal {
+    color: #008080;
+    border-color: #008080;
+}
+
+.btn-outline-teal:hover {
+    background-color: #008080;
+    color: white;
+}
+
+.bg-teal {
+    background-color: #008080 !important;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.list-group-item {
+    border: none;
+    padding: 1rem 0;
+}
+
+.badge {
+    font-size: 0.7em;
+}
+</style>
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}

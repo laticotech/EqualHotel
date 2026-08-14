@@ -1,0 +1,188 @@
+{% extends 'homebase.html' %}
+
+{% block title %}Contact Inquiries - Admin{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>CONTACT INQUIRIES</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Admin Content -->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-12">
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-white bg-primary">
+                        <div class="card-body">
+                            <h4>{{ total_inquiries }}</h4>
+                            <p>Total Inquiries</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <h4>{{ resolved_inquiries }}</h4>
+                            <p>Resolved</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-warning">
+                        <div class="card-body">
+                            <h4>{{ unresolved_inquiries }}</h4>
+                            <p>Unresolved</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-info">
+                        <div class="card-body">
+                            <h4>{{ inquiries|length }}</h4>
+                            <p>This Page</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form method="get" class="d-flex">
+                                <select name="status" class="form-select me-2" onchange="this.form.submit()">
+                                    <option value="">All Status</option>
+                                    <option value="resolved" {% if request.GET.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                                    <option value="unresolved" {% if request.GET.status == 'unresolved' %}selected{% endif %}>Unresolved</option>
+                                </select>
+                                <select name="type" class="form-select" onchange="this.form.submit()">
+                                    <option value="">All Types</option>
+                                    {% for type_value, type_name in view.model.INQUIRY_TYPES %}
+                                    <option value="{{ type_value }}" {% if request.GET.type == type_value %}selected{% endif %}>{{ type_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Inquiries Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Contact Inquiries</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Type</th>
+                                    <th>Subject</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for inquiry in inquiries %}
+                                <tr>
+                                    <td>{{ inquiry.name }}</td>
+                                    <td>{{ inquiry.email }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ inquiry.get_inquiry_type_display }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'contact_inquiry_detail' inquiry.pk %}" class="text-decoration-none">
+                                            {{ inquiry.subject|truncatewords:5 }}
+                                        </a>
+                                    </td>
+                                    <td>{{ inquiry.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if inquiry.is_resolved %}
+                                        <span class="badge bg-success">Resolved</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'contact_inquiry_detail' inquiry.pk %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'contact_inquiry_delete' inquiry.pk %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <i class="fas fa-inbox fa-2x text-muted mb-3"></i>
+                                        <p class="text-muted">No inquiries found.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if is_paginated %}
+                    <nav aria-label="Inquiry pagination" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">Previous</a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Admin Content -->
+{% endblock %}
+
+{% block foot %}{% include 'footer.html' %}{% endblock %}

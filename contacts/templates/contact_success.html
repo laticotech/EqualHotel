@@ -1,0 +1,43 @@
+{% extends 'homebase.html' %}
+
+{% block title %}Message Sent Successfully{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>MESSAGE SENT</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Success Message -->
+<div class="contact-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="heading-title text-center">
+                    <i class="fas fa-check-circle text-success mb-4" style="font-size: 4rem;"></i>
+                    <h2>Thank You!</h2>
+                    <p class="lead">Your message has been sent successfully.</p>
+                    <p>We have received your inquiry and will get back to you within 24 hours.</p>
+                    
+                    <div class="mt-4">
+                        <a href="/" class="btn btn-common me-3">Go Home</a>
+                        <a href="{% url 'contact' %}" class="btn btn-outline-common">Send Another Message</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Success Message -->
+{% endblock %}
+
+{% block foot %}{% include 'footer.html' %}{% endblock %}

@@ -1,0 +1,204 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}{{ image.title|default:"Gallery Image" }} - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>GALLERY DETAIL</h1>
+                <p class="text-white">{{ image.title|default:"Beautiful Moments" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Image Detail -->
+<div class="image-detail py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Navigation -->
+            <div class="col-12 mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'gallery_list' %}">Gallery</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'gallery_category' image.category.id %}">{{ image.category.name }}</a></li>
+                        <li class="breadcrumb-item active">{{ image.title|default:"Image Detail" }}</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Main Image -->
+            <div class="col-lg-8">
+                <div class="main-image-card card border-0 shadow-sm">
+                    <img src="{{ image.image.url }}" class="card-img-top" alt="{{ image.title|default:'Gallery Image' }}" 
+                         style="max-height: 600px; width: 100%; object-fit: contain;">
+                    <div class="card-body">
+                        {% if image.title %}
+                        <h2 class="card-title teal-text">{{ image.title }}</h2>
+                        {% endif %}
+                        {% if image.caption %}
+                        <p class="card-text lead">{{ image.caption }}</p>
+                        {% endif %}
+                        <div class="image-meta mt-4">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <i class="fas fa-folder teal-text"></i>
+                                    <p class="mb-0 small">{{ image.category.name }}</p>
+                                </div>
+                                <div class="col-4">
+                                    <i class="fas fa-calendar teal-text"></i>
+                                    <p class="mb-0 small">{{ image.uploaded_at|date:"F j, Y" }}</p>
+                                </div>
+                                <div class="col-4">
+                                    <i class="fas fa-star teal-text"></i>
+                                    <p class="mb-0 small">
+                                        {% if image.is_featured %}Featured{% else %}Standard{% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Navigation Buttons -->
+                <div class="navigation-card card border-0 shadow-sm mb-4">
+                    <div class="card-header teal-bg text-white">
+                        <h5 class="mb-0">Navigation</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            {% if previous_image %}
+                            <a href="{% url 'gallery_detail' previous_image.id %}" class="btn btn-outline-teal">
+                                <i class="fas fa-arrow-left me-2"></i> Previous Image
+                            </a>
+                            {% endif %}
+                            
+                            <a href="{% url 'gallery_category' image.category.id %}" class="btn teal-btn">
+                                <i class="fas fa-images me-2"></i> Back to Category
+                            </a>
+                            
+                            {% if next_image %}
+                            <a href="{% url 'gallery_detail' next_image.id %}" class="btn btn-outline-teal">
+                                Next Image <i class="fas fa-arrow-right ms-2"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Info -->
+                <div class="category-card card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Category Info</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="teal-text">{{ image.category.name }}</h6>
+                        {% if image.category.description %}
+                        <p class="small">{{ image.category.description }}</p>
+                        {% endif %}
+                        <a href="{% url 'gallery_category' image.category.id %}" class="btn btn-sm teal-btn w-100">
+                            View All in Category
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Related Images -->
+                {% if related_images %}
+                <div class="related-card card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Related Images</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            {% for related in related_images %}
+                            <div class="col-4">
+                                <a href="{% url 'gallery_detail' related.id %}">
+                                    <img src="{{ related.image.url }}" class="img-fluid rounded" 
+                                         alt="{{ related.title|default:'Related Image' }}"
+                                         style="height: 80px; width: 100%; object-fit: cover;">
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Image Detail -->
+
+<style>
+.teal-text {
+    color: #008080 !important;
+}
+
+.teal-btn {
+    background-color: #008080 !important;
+    border-color: #008080 !important;
+    color: white !important;
+}
+
+.teal-btn:hover {
+    background-color: #006666 !important;
+    border-color: #006666 !important;
+}
+
+.teal-bg {
+    background-color: #008080 !important;
+}
+
+.btn-outline-teal {
+    border-color: #008080;
+    color: #008080;
+}
+
+.btn-outline-teal:hover {
+    background-color: #008080;
+    color: white;
+}
+
+.main-image-card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.navigation-card, .category-card, .related-card {
+    border-radius: 10px;
+}
+
+.image-meta {
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+}
+
+.breadcrumb-item a {
+    color: #008080;
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: #6c757d;
+}
+</style>
+
+{% endblock %}
+
+{% block foot %}{% include 'footer.html' %}{% endblock %}

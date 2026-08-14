@@ -1,0 +1,262 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}Our Location - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>OUR LOCATION</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Location Section -->
+<div class="location-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="heading-title text-center">
+                    <h2>Find Us</h2>
+                    <p>Visit us at our convenient location</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Embedded Google Map -->
+            <div class="col-lg-8 mb-4">
+                <div class="location-map card h-100 border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="map-container">
+                            <iframe
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3962.12283571408!2d-0.8824651!3d9.3626003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfd423c1a64cc86d%3A0x924ad7828c7b3d5f!2sEqual%20Hotel%20%26%20Restaurant!5e0!3m2!1sen!2sgh!4v1698765432107!5m2!1sen!2sgh&zoom=16&language=en&output=embed"
+    width="100%"
+    height="400"
+    style="border:0; border-radius: 8px;"
+    allowfullscreen=""
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade">
+</iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location Details -->
+            <div class="col-lg-4 mb-4">
+                <div class="location-info card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0"><i class="fas fa-info-circle me-2"></i>Location Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="location-detail mb-4">
+                            <h6><i class="fas fa-map-marker-alt text-primary me-2"></i>Address</h6>
+                            <p class="ms-4">{{ hotel.address|linebreaksbr }}</p>
+                        </div>
+
+                        <div class="location-detail mb-4">
+                            <h6><i class="fas fa-phone text-primary me-2"></i>Phone</h6>
+                            <p class="ms-4">
+                                <a href="tel:{{ hotel.phone }}" class="text-decoration-none">{{ hotel.phone }}</a>
+                            </p>
+                        </div>
+
+                        <div class="location-detail mb-4">
+                            <h6><i class="fas fa-envelope text-primary me-2"></i>Email</h6>
+                            <p class="ms-4">
+                                <a href="mailto:{{ hotel.email }}" class="text-decoration-none">{{ hotel.email }}</a>
+                            </p>
+                        </div>
+
+                        {% if hotel.website %}
+                        <div class="location-detail mb-4">
+                            <h6><i class="fas fa-globe text-primary me-2"></i>Website</h6>
+                            <p class="ms-4">
+                                <a href="{{ hotel.website }}" target="_blank" class="text-decoration-none">Visit Website</a>
+                            </p>
+                        </div>
+                        {% endif %}
+
+                        <!-- Quick Actions -->
+                        <div class="location-actions mt-4">
+                            <div class="d-grid gap-2">
+                                <a href="https://maps.google.com/?q=Equal+Hotel+%26+Restaurant@9.3625024,-0.8801208"
+                                   target="_blank"
+                                   class="btn btn-outline-primary">
+                                    <i class="fas fa-directions me-2"></i>Get Directions
+                                </a>
+                                <a href="tel:{{ hotel.phone }}" class="btn btn-outline-success">
+                                    <i class="fas fa-phone me-2"></i>Call Now
+                                </a>
+                                <a href="{% url 'contact' %}" class="btn btn-outline-info">
+                                    <i class="fas fa-envelope me-2"></i>Contact Us
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transportation Options -->
+        <div class="row mt-5">
+            <div class="col-lg-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0"><i class="fas fa-car me-2"></i>Getting Here</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-4">
+                                <div class="text-center">
+                                    <i class="fas fa-car-side fa-2x text-primary mb-3"></i>
+                                    <h6>By Car</h6>
+                                    <p class="text-muted small">Convenient parking available on premises. Easy access from main roads.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="text-center">
+                                    <i class="fas fa-bus fa-2x text-success mb-3"></i>
+                                    <h6>Public Transport</h6>
+                                    <p class="text-muted small">Multiple bus routes stop nearby. Taxis readily available in the area.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="text-center">
+                                    <i class="fas fa-taxi fa-2x text-warning mb-3"></i>
+                                    <h6>Ride Services</h6>
+                                    <p class="text-muted small">Uber and Bolt services operate in this area for easy transportation.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nearby Attractions -->
+        <div class="row mt-4">
+            <div class="col-lg-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0"><i class="fas fa-landmark me-2"></i>Nearby Attractions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 text-center mb-3">
+                                <i class="fas fa-shopping-bag fa-2x text-warning mb-2"></i>
+                                <h6>Local Markets</h6>
+                                <small class="text-muted">Various local markets nearby</small>
+                            </div>
+                            <div class="col-md-3 text-center mb-3">
+                                <i class="fas fa-utensils fa-2x text-danger mb-2"></i>
+                                <h6>Dining Options</h6>
+                                <small class="text-muted">Multiple restaurants in vicinity</small>
+                            </div>
+                            <div class="col-md-3 text-center mb-3">
+                                <i class="fas fa-university fa-2x text-info mb-2"></i>
+                                <h6>City Center</h6>
+                                <small class="text-muted">Easy access to city amenities</small>
+                            </div>
+                            <div class="col-md-3 text-center mb-3">
+                                <i class="fas fa-gas-pump fa-2x text-success mb-2"></i>
+                                <h6>Fuel Stations</h6>
+                                <small class="text-muted">Multiple fuel stations nearby</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Location Section -->
+
+<!-- Start Contact info -->
+<div class="contact-imfo-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 arrow-right">
+                <i class="fa fa-volume-control-phone"></i>
+                <div class="overflow-hidden">
+                    <h4>Phone</h4>
+                    <p class="lead">
+                        {{ hotel.phone }}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 arrow-right">
+                <i class="fa fa-envelope"></i>
+                <div class="overflow-hidden">
+                    <h4>Email</h4>
+                    <p class="lead">
+                        {{ hotel.email }}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <i class="fa fa-map-marker"></i>
+                <div class="overflow-hidden">
+                    <h4>Location</h4>
+                    <p class="lead">
+                        {{ hotel.address|safe }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Contact info -->
+{% endblock %}
+
+{% block foot %}{% include 'footer.html' %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.location-map {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.location-info {
+    border-radius: 10px;
+}
+
+.location-detail {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.location-detail:last-child {
+    border-bottom: none;
+}
+
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-success:hover,
+.btn-outline-info:hover {
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+.map-container iframe {
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

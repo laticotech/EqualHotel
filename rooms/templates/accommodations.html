@@ -1,0 +1,508 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}Our Accommodations - Luxury Hotel{% endblock %}
+
+{% block content %}
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>OUR ACCOMMODATIONS</h1>
+                <p class="text-white">Discover Your Perfect Stay</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Modern Filter Section -->
+<div class="modern-filter-section py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-12">
+                <div class="filter-card our-team" style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                    <div class="text-center mb-4">
+                        <h3 class="fw-bold teal-text mb-2">Find Your Perfect Room</h3>
+                        <p class="text-muted">Refine your search with our smart filters</p>
+                    </div>
+
+                    <form method="get" class="modern-filter-form">
+                        <div class="row align-items-end">
+                            <!-- Price Filter -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold">Price Range (GHC)</label>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <input type="number" class="form-control"
+                                                   name="price_min" placeholder="Min"
+                                                   value="{{ current_filters.price_min }}"
+                                                   min="{{ price_range.min_price }}"
+                                                   max="{{ price_range.max_price }}">
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="number" class="form-control"
+                                                   name="price_max" placeholder="Max"
+                                                   value="{{ current_filters.price_max }}"
+                                                   min="{{ price_range.min_price }}"
+                                                   max="{{ price_range.max_price }}">
+                                        </div>
+                                    </div>
+                                    <small class="text-muted mt-1 d-block">
+                                        Range: GHC {{ price_range.min_price }} - {{ price_range.max_price }}
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Capacity Filter -->
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold">Guests</label>
+                                    <select class="form-control" name="capacity">
+                                        <option value="">Any Guests</option>
+                                        <option value="1" {% if current_filters.capacity == "1" %}selected{% endif %}>1 Guest</option>
+                                        <option value="2" {% if current_filters.capacity == "2" %}selected{% endif %}>2 Guests</option>
+                                        <option value="3" {% if current_filters.capacity == "3" %}selected{% endif %}>3 Guests</option>
+                                        <option value="4" {% if current_filters.capacity == "4" %}selected{% endif %}>4+ Guests</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Bed Type Filter -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold">Bed Type</label>
+                                    <select class="form-control" name="bed_type">
+                                        <option value="">All Bed Types</option>
+                                        {% for bed_type in available_bed_types %}
+                                        <option value="{{ bed_type }}" {% if current_filters.bed_type == bed_type %}selected{% endif %}>
+                                            {{ bed_type }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Search Filter -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="form-label fw-semibold">Search Rooms</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-search text-muted"></i>
+                                        </span>
+                                        <input type="text" class="form-control"
+                                               name="search" placeholder="Room name, features..."
+                                               value="{{ current_filters.search }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Alternative Icons -->
+                            <div class="col-md-1">
+    <div class="form-group">
+        <div class="d-flex flex-column gap-2">
+            <button type="submit" class="btn teal-btn" style="height: 42px;" title="Search Rooms">
+                <i class="fas fa-search"></i>
+            </button>
+            <a href="{% url 'accommodations' %}" class="btn btn-secondary" style="height: 42px;" title="Reset Filters">
+                <i class="fas fa-redo"></i>
+            </a>
+        </div>
+    </div>
+</div>
+                        </div>
+
+                        <!-- Active Filters Display -->
+                        {% if current_filters.price_min or current_filters.price_max or current_filters.capacity or current_filters.bed_type or current_filters.search %}
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="active-filters-section">
+                                    <h6 class="fw-semibold mb-2">Active Filters:</h6>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {% if current_filters.price_min or current_filters.price_max %}
+                                        <span class="filter-tag">
+                                            <i class="fas fa-tag me-1"></i>
+                                            Price:
+                                            {% if current_filters.price_min %}GHC {{ current_filters.price_min }}{% endif %}
+                                            {% if current_filters.price_min and current_filters.price_max %} - {% endif %}
+                                            {% if current_filters.price_max %}GHC {{ current_filters.price_max }}{% endif %}
+                                        </span>
+                                        {% endif %}
+
+                                        {% if current_filters.capacity %}
+                                        <span class="filter-tag">
+                                            <i class="fas fa-users me-1"></i>
+                                            {{ current_filters.capacity }}+ Guests
+                                        </span>
+                                        {% endif %}
+
+                                        {% if current_filters.bed_type %}
+                                        <span class="filter-tag">
+                                            <i class="fas fa-bed me-1"></i>
+                                            {{ current_filters.bed_type }}
+                                        </span>
+                                        {% endif %}
+
+                                        {% if current_filters.search %}
+                                        <span class="filter-tag">
+                                            <i class="fas fa-search me-1"></i>
+                                            "{{ current_filters.search }}"
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Modern Filter Section -->
+
+<style>
+/* Teal Color Theme */
+.teal-text {
+    color: #008080 !important;
+}
+
+.teal-btn {
+    background-color: #008080 !important;
+    border-color: #008080 !important;
+    color: white !important;
+    transition: all 0.3s ease;
+}
+
+.teal-btn:hover {
+    background-color: #006666 !important;
+    border-color: #006666 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 128, 128, 0.3);
+}
+
+.teal-bg {
+    background-color: #008080 !important;
+}
+
+.teal-border {
+    border-color: #008080 !important;
+}
+
+/* Filter Section Styles */
+.modern-filter-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.filter-card {
+    border-radius: 12px;
+}
+
+.modern-filter-form .form-control {
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.modern-filter-form .form-control:focus {
+    border-color: #008080;
+    box-shadow: 0 0 0 0.2rem rgba(0, 128, 128, 0.25);
+}
+
+.modern-filter-form label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.filter-tag {
+    display: inline-flex;
+    align-items: center;
+    background: #008080;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.active-filters-section {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #008080;
+}
+
+.input-group-text {
+    border-radius: 6px 0 0 6px;
+    border: 1px solid #dee2e6;
+    border-right: none;
+}
+
+.input-group .form-control {
+    border-radius: 0 6px 6px 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .modern-filter-section {
+        padding: 1.5rem 0 !important;
+    }
+
+    .filter-card {
+        padding: 1.5rem !important;
+    }
+
+    .modern-filter-form .row > div {
+        margin-bottom: 1rem;
+    }
+
+    .active-filters-section .d-flex {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filter-tag {
+        margin-bottom: 0.5rem;
+    }
+
+    .modern-filter-form .btn {
+        width: 100%;
+    }
+
+    .form-group .d-flex {
+        flex-direction: row !important;
+        gap: 10px;
+    }
+
+    .form-group .d-flex .btn {
+        flex: 1;
+    }
+}
+</style>
+
+<!-- Start Rooms Grid -->
+<div class="rooms-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="heading-title text-center mb-5">
+                    <h2 class="teal-text">LUXURY ACCOMMODATIONS</h2>
+                    <p class="lead">Experience unparalleled comfort and elegance</p>
+                </div>
+            </div>
+        </div>
+
+        {% if room_types %}
+        <div class="row">
+            {% for room_type in room_types %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="room-card card h-100 shadow-sm border-0">
+                    <div class="room-image position-relative overflow-hidden">
+                        {% if room_type.featured_image %}
+                        <img src="{{ room_type.featured_image.url }}" class="card-img-top" alt="{{ room_type.name }}"
+                             style="height: 250px; object-fit: cover;">
+                        {% else %}
+                        <img src="{% static 'images/default-room.jpg' %}" class="card-img-top" alt="Default Room Image"
+                             style="height: 250px; object-fit: cover;">
+                        {% endif %}
+                        <div class="room-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                            <div class="room-actions">
+                                <a href="{% url 'accommodation_details' room_type.slug %}" class="btn btn-light btn-sm mx-1">
+                                    <i class="fa fa-eye"></i> View Details
+                                </a>
+                                <!-- Book Now button redirects to detail page for booking -->
+                                <a href="{% url 'accommodation_details' room_type.slug %}" class="btn teal-btn btn-sm mx-1">
+                                    <i class="fa fa-calendar"></i> Book Now
+                                </a>
+                            </div>
+                        </div>
+                        <div class="room-badge position-absolute top-0 end-0 m-3">
+                            <span class="badge teal-bg">Available</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold teal-text">{{ room_type.name }}</h5>
+                        <p class="card-text text-muted small">{{ room_type.description|truncatewords:20 }}</p>
+
+                        <div class="room-features mb-3">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <i class="fa fa-users teal-text"></i>
+                                    <small class="d-block">{{ room_type.capacity }} Guests</small>
+                                </div>
+                                <div class="col-4">
+                                    <i class="fa fa-bed teal-text"></i>
+                                    <small class="d-block">{{ room_type.bed_type }}</small>
+                                </div>
+                                <div class="col-4">
+                                    <i class="fa fa-arrows-alt teal-text"></i>
+                                    <small class="d-block">{{ room_type.size }} sq ft</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="room-price d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="teal-text mb-0">GHC {{ room_type.base_price }}</h4>
+                                <small class="text-muted">per night</small>
+                            </div>
+                            <a href="{% url 'accommodation_details' room_type.slug %}" class="btn teal-btn btn-sm">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if room_types.has_other_pages %}
+        <div class="row mt-5">
+            <div class="col-lg-12">
+                <nav aria-label="Room pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if room_types.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ room_types.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for i in room_types.paginator.page_range %}
+                            {% if room_types.number == i %}
+                            <li class="page-item active">
+                                <span class="page-link teal-bg teal-border">{{ i }}</span>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link teal-text" href="?page={{ i }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if room_types.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ room_types.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="alert alert-warning">
+                    <h4>No rooms found</h4>
+                    <p>Please try adjusting your filters or search criteria.</p>
+                    <a href="{% url 'accommodations' %}" class="btn teal-btn">View All Rooms</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<!-- End Rooms Grid -->
+
+<style>
+.room-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.room-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+
+.room-image {
+    overflow: hidden;
+}
+
+.room-image img {
+    transition: transform 0.3s ease;
+}
+
+.room-card:hover .room-image img {
+    transform: scale(1.05);
+}
+
+.room-overlay {
+    background: rgba(0,0,0,0.7);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.room-card:hover .room-overlay {
+    opacity: 1;
+}
+
+.room-features {
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+}
+
+.room-badge .badge {
+    font-size: 0.8em;
+    padding: 5px 10px;
+}
+
+.room-price h4 {
+    font-weight: bold;
+}
+
+.pagination .page-link {
+    border-radius: 5px;
+    margin: 0 2px;
+    border: 1px solid #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #008080;
+    border-color: #008080;
+}
+
+.pagination .page-link.teal-text {
+    color: #008080;
+}
+
+.pagination .page-link.teal-text:hover {
+    background-color: #008080;
+    color: white;
+    border-color: #008080;
+}
+</style>
+
+<script>
+// Simple filter form enhancement
+document.addEventListener('DOMContentLoaded', function() {
+    // Add focus effects to filter inputs
+    const filterInputs = document.querySelectorAll('.modern-filter-form .form-control');
+
+    filterInputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('filter-focused');
+        });
+
+        input.addEventListener('blur', function() {
+            this.parentElement.classList.remove('filter-focused');
+        });
+    });
+});
+</script>
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}

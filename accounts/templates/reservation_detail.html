@@ -1,0 +1,173 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}Reservation {{ reservation.reservation_number }} - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>RESERVATION DETAILS</h1>
+                <p>Reservation Number: {{ reservation.reservation_number }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-teal text-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Service Reservation Details</h4>
+                        <span class="badge 
+                            {% if reservation.status == 'confirmed' %}bg-success
+                            {% elif reservation.status == 'pending' %}bg-warning
+                            {% elif reservation.status == 'completed' %}bg-info
+                            {% elif reservation.status == 'cancelled' %}bg-danger
+                            {% else %}bg-light text-dark{% endif %}">
+                            {{ reservation.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-teal mb-3">Reservation Information</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Reservation Number:</strong></td>
+                                    <td>{{ reservation.reservation_number }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Service:</strong></td>
+                                    <td>
+                                        <strong>{{ reservation.service.name }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ reservation.service.category }}</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Date:</strong></td>
+                                    <td>{{ reservation.reservation_date|date:"F d, Y" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Time:</strong></td>
+                                    <td>{{ reservation.reservation_time|time:"g:i A" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Number of Guests:</strong></td>
+                                    <td>{{ reservation.number_of_guests }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Created:</strong></td>
+                                    <td>{{ reservation.created_at|date:"F d, Y" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-teal mb-3">Service Details</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Category:</strong></td>
+                                    <td>{{ reservation.service.category }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Duration:</strong></td>
+                                    <td>{{ reservation.service.duration }} minutes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Price:</strong></td>
+                                    <td>${{ reservation.service.price }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Location:</strong></td>
+                                    <td>{{ reservation.service.location }}</td>
+                                </tr>
+                                {% if reservation.service.description %}
+                                <tr>
+                                    <td><strong>Description:</strong></td>
+                                    <td>{{ reservation.service.description }}</td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="text-teal mb-3">Guest Information</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Full Name:</strong></td>
+                                    <td>{{ reservation.guest_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email:</strong></td>
+                                    <td>{{ reservation.guest_email }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Phone:</strong></td>
+                                    <td>{{ reservation.guest_phone }}</td>
+                                </tr>
+                                {% if reservation.special_requests %}
+                                <tr>
+                                    <td><strong>Special Requests:</strong></td>
+                                    <td>{{ reservation.special_requests }}</td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="btn-group">
+                            <a href="{% url 'my_reservations' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Reservations
+                            </a>
+                            {% if reservation.status in ['pending', 'confirmed'] %}
+                            <a href="{% url 'cancel_reservation' reservation.reservation_number %}" class="btn btn-outline-danger">
+                                <i class="fas fa-times me-2"></i>Cancel Reservation
+                            </a>
+                            {% endif %}
+                            <button onclick="window.print()" class="btn btn-outline-teal">
+                                <i class="fas fa-print me-2"></i>Print
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.text-teal {
+    color: #008080;
+}
+
+.btn-outline-teal {
+    color: #008080;
+    border-color: #008080;
+}
+
+.btn-outline-teal:hover {
+    background-color: #008080;
+    color: white;
+}
+
+.table-borderless td {
+    padding: 8px 0;
+    border: none;
+}
+</style>
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}

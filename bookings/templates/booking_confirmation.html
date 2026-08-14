@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #008080; color: white; padding: 20px; text-align: center; }
+        .content { background: #f9f9f9; padding: 20px; border-radius: 5px; }
+        .booking-details { background: white; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+        .success-badge { background: #28a745; color: white; padding: 10px; border-radius: 5px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Booking Confirmed!</h1>
+            <p>Thank you for choosing our hotel</p>
+        </div>
+
+        <div class="content">
+            <div class="success-badge">
+                <h3>✅ Booking Reference: {{ booking.booking_reference }}</h3>
+            </div>
+
+            <div class="booking-details">
+                <h3>Guest Information</h3>
+                <p><strong>Name:</strong> {{ booking.guest_name }}</p>
+                <p><strong>Email:</strong> {{ booking.guest_email }}</p>
+                <p><strong>Phone:</strong> {{ booking.guest_phone }}</p>
+                {% if booking.guest_address %}
+                <p><strong>Address:</strong> {{ booking.guest_address }}</p>
+                {% endif %}
+            </div>
+
+            <div class="booking-details">
+                <h3>Booking Details</h3>
+                <p><strong>Room:</strong> {{ booking.room.room_type.name }} - Room {{ booking.room.room_number }}</p>
+                <p><strong>Check-in:</strong> {{ booking.check_in }}</p>
+                <p><strong>Check-out:</strong> {{ booking.check_out }}</p>
+                <p><strong>Nights:</strong> {{ booking.nights }}</p>
+                <p><strong>Guests:</strong> {{ booking.adults }} Adults, {{ booking.children }} Children</p>
+                <p><strong>Total Amount:</strong> GHS {{ booking.total_price }}</p>
+
+                {% if booking.special_requests %}
+                <p><strong>Special Requests:</strong> {{ booking.special_requests }}</p>
+                {% endif %}
+            </div>
+
+            <div class="booking-details">
+                <h3>Next Steps</h3>
+                <p>1. Present this booking reference at check-in: <strong>{{ booking.booking_reference }}</strong></p>
+                <p>2. Payment can be made upon arrival</p>
+                <p>3. Check-in time: 2:00 PM | Check-out time: 11:00 AM</p>
+            </div>
+
+            <div class="booking-details">
+                <h3>Contact Information</h3>
+                <p>If you have any questions, please contact us:</p>
+                <p>Email: {{ contact_email }}</p>
+                <p>Phone: {{ contact_phone }}</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Thank you for choosing {{ hotel_name }}!</p>
+            <p>We look forward to welcoming you.</p>
+        </div>
+    </div>
+</body>
+</html>

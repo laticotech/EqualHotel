@@ -1,0 +1,58 @@
+{% extends 'homebase.html' %}
+
+{% block title %}Upcoming Events - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-4 text-center mb-5">Upcoming Events</h1>
+        </div>
+    </div>
+
+    {% if upcoming_events %}
+    <div class="row">
+        {% for event in upcoming_events %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if event.image %}
+                <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}" style="height: 200px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <span class="badge bg-primary mb-2">{{ event.get_event_type_display }}</span>
+                    <h5 class="card-title">{{ event.title }}</h5>
+                    <p class="card-text">{{ event.description|truncatewords:20 }}</p>
+                    
+                    <div class="event-details">
+                        <p class="mb-1"><i class="fas fa-calendar-alt me-2"></i>{{ event.start_date|date:"M d, Y H:i" }}</p>
+                        <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}</p>
+                        {% if event.max_attendees > 0 %}
+                        <p class="mb-1"><i class="fas fa-users me-2"></i>{{ event.current_attendees }}/{{ event.max_attendees }} attendees</p>
+                        {% endif %}
+                        {% if event.price > 0 %}
+                        <p class="mb-1"><i class="fas fa-tag me-2"></i>${{ event.price }}</p>
+                        {% else %}
+                        <p class="mb-1"><i class="fas fa-tag me-2"></i>Free</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'event_detail' event.id %}" class="btn btn-primary btn-sm">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="alert alert-info">
+                <h4>No Upcoming Events</h4>
+                <p>Check back later for exciting events!</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}

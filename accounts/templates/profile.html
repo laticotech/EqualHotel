@@ -1,0 +1,341 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}My Profile - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>MY PROFILE</h1>
+                <p>Manage your account information</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            {% if messages %}
+            <div class="messages mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-teal text-white py-3">
+                    <h4 class="mb-0">Profile Information</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Profile Picture -->
+                            <div class="col-md-4 text-center mb-4">
+                                <div class="profile-picture-container">
+                                    {% if profile.profile_pic %}
+                                        <img src="{{ profile.profile_pic.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                                        <div class="current-image-info">
+                                            <small class="text-muted">
+                                                Current: {{ profile.profile_pic.name|slice:":10" }}...
+                                            </small>
+                                        </div>
+                                    {% else %}
+                                        <img src="{% static 'images/user.png' %}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                                        <div class="current-image-info">
+                                            <small class="text-muted">Default image</small>
+                                        </div>
+                                    {% endif %}
+
+                                    <div class="mt-3">
+                                        <label for="{{ profile_form.profile_pic.id_for_label }}" class="form-label">Change Profile Picture</label>
+                                        <input type="file"
+                                               name="{{ profile_form.profile_pic.name }}"
+                                               class="form-control form-control-sm"
+                                               id="{{ profile_form.profile_pic.id_for_label }}"
+                                               accept="image/*">
+                                        {% if profile_form.profile_pic.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in profile_form.profile_pic.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- User Information -->
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ user_form.first_name.id_for_label }}" class="form-label">First Name *</label>
+                                        <input type="text"
+                                               name="{{ user_form.first_name.name }}"
+                                               class="form-control"
+                                               id="{{ user_form.first_name.id_for_label }}"
+                                               value="{{ user_form.first_name.value|default:'' }}"
+                                               required>
+                                        {% if user_form.first_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in user_form.first_name.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Last Name *</label>
+                                        <input type="text"
+                                               name="{{ user_form.last_name.name }}"
+                                               class="form-control"
+                                               id="{{ user_form.last_name.id_for_label }}"
+                                               value="{{ user_form.last_name.value|default:'' }}"
+                                               required>
+                                        {% if user_form.last_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in user_form.last_name.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ user_form.email.id_for_label }}" class="form-label">Email *</label>
+                                    <input type="email"
+                                           name="{{ user_form.email.name }}"
+                                           class="form-control"
+                                           id="{{ user_form.email.id_for_label }}"
+                                           value="{{ user_form.email.value|default:'' }}"
+                                           required>
+                                    {% if user_form.email.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in user_form.email.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" class="form-control" value="{{ user.username }}" disabled>
+                                    <small class="text-muted">Username cannot be changed</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Profile Details -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ profile_form.phone.id_for_label }}" class="form-label">Phone</label>
+                                <input type="text"
+                                       name="{{ profile_form.phone.name }}"
+                                       class="form-control"
+                                       id="{{ profile_form.phone.id_for_label }}"
+                                       value="{{ profile_form.phone.value|default:'' }}"
+                                       placeholder="Enter your phone number">
+                                {% if profile_form.phone.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in profile_form.phone.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ profile_form.address.id_for_label }}" class="form-label">Address</label>
+                                <input type="text"
+                                       name="{{ profile_form.address.name }}"
+                                       class="form-control"
+                                       id="{{ profile_form.address.id_for_label }}"
+                                       value="{{ profile_form.address.value|default:'' }}"
+                                       placeholder="Enter your address">
+                                {% if profile_form.address.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in profile_form.address.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ profile_form.bio.id_for_label }}" class="form-label">Bio</label>
+                            <textarea name="{{ profile_form.bio.name }}"
+                                      class="form-control"
+                                      id="{{ profile_form.bio.id_for_label }}"
+                                      rows="4"
+                                      placeholder="Tell us a little about yourself...">{{ profile_form.bio.value|default:'' }}</textarea>
+                            {% if profile_form.bio.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in profile_form.bio.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-teal btn-lg">
+                                <i class="fas fa-save me-2"></i>Update Profile
+                            </button>
+                            <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-lg ms-2">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Stats -->
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body">
+                            <h3 class="text-teal">{{ user.bookings.count }}</h3>
+                            <p class="mb-0">Total Bookings</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body">
+                            <h3 class="text-teal">{{ user.servicereservation_set.count }}</h3>
+                            <p class="mb-0">Service Reservations</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body">
+                            <h3 class="text-teal">{{ user.date_joined|date:"M Y" }}</h3>
+                            <p class="mb-0">Member Since</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-control {
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #008080;
+    box-shadow: 0 0 0 0.2rem rgba(0, 128, 128, 0.25);
+    transform: translateY(-2px);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+.btn-teal {
+    background: #008080;
+    border-color: #008080;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-teal:hover {
+    background: #006666;
+    border-color: #006666;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 128, 128, 0.3);
+}
+
+.profile-picture-container img {
+    border: 3px solid #008080;
+    transition: all 0.3s ease;
+}
+
+.profile-picture-container img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.current-image-info {
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 6px;
+    margin-top: 10px;
+}
+
+.text-teal {
+    color: #008080;
+}
+
+.card {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+/* Custom file input styling */
+.form-control[type="file"] {
+    padding: 8px;
+}
+
+.form-control[type="file"]:focus {
+    border-color: #008080;
+    box-shadow: 0 0 0 0.2rem rgba(0, 128, 128, 0.25);
+}
+
+/* Error styling */
+.text-danger small {
+    font-size: 0.875em;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .profile-picture-container {
+        margin-bottom: 2rem;
+    }
+
+    .btn-lg {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+}
+</style>
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}

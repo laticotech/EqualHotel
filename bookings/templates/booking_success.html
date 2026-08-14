@@ -1,0 +1,205 @@
+{% extends 'homebase.html' %}
+
+{% block title %}Booking Confirmation - {{ booking.booking_reference }}{% endblock %}
+
+{% block content %}
+{% load static %}
+
+    <!-- Start All Pages -->
+	<div class="all-page-title page-breadcrumb">
+		<div class="container text-center">
+			<div class="row">
+				<div class="col-lg-12">
+					<h1>Booking Confirmed!</h1>
+					<p>Reference: {{ booking.booking_reference }}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End All Pages -->
+
+	<!-- Start success -->
+	<div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <!-- Print Button -->
+                <div class="text-right mb-3">
+                    <button onclick="printBooking()" class="btn btn-success">
+                        <i class="fa fa-print"></i> Print Confirmation
+                    </button>
+                    <button onclick="emailConfirmation()" class="btn btn-info ml-2">
+                        <i class="fa fa-envelope"></i> Email Again
+                    </button>
+                </div>
+
+                <div class="card shadow" id="bookingConfirmation">
+                    <div class="card-header bg-success text-white text-center">
+                        <h3><i class="fa fa-check-circle"></i> Booking Confirmed!</h3>
+                        <p class="mb-0">Reference: <strong>{{ booking.booking_reference }}</strong></p>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <h4>Thank you, {{ booking.guest_name }}!</h4>
+                            <p class="lead">Your reservation has been received successfully.</p>
+                            <div class="alert alert-success">
+                                <i class="fa fa-info-circle"></i>
+                                A confirmation email has been sent to <strong>{{ booking.guest_email }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="booking-details p-4 bg-light rounded">
+                            <h5 class="text-center mb-4">Booking Details</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Booking Reference:</strong><br>
+                                       <span class="h6 text-primary">{{ booking.booking_reference }}</span>
+                                    </p>
+                                    <p><strong>Guest Name:</strong><br>{{ booking.guest_name }}</p>
+                                    <p><strong>Email:</strong><br>{{ booking.guest_email }}</p>
+                                    <p><strong>Phone:</strong><br>{{ booking.guest_phone }}</p>
+                                    {% if booking.guest_address %}
+                                    <p><strong>Address:</strong><br>{{ booking.guest_address }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Check-in:</strong><br>{{ booking.check_in }}</p>
+                                    <p><strong>Check-out:</strong><br>{{ booking.check_out }}</p>
+                                    <p><strong>Nights:</strong><br>{{ booking.nights }}</p>
+                                    <p><strong>Total Price:</strong><br>
+                                       <span class="h5 text-success">GHS {{ booking.total_price }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <p><strong>Room:</strong> {{ booking.room.room_type.name }} - Room {{ booking.room.room_number }}</p>
+                                    <p><strong>Guests:</strong> {{ booking.adults }} Adults, {{ booking.children }} Children</p>
+                                    {% if booking.special_requests %}
+                                    <p><strong>Special Requests:</strong><br>{{ booking.special_requests }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-4">
+                            <h6><i class="fa fa-info-circle"></i> Important Information</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1">✅ Confirmation email sent</p>
+                                    <p class="mb-1">✅ Present booking reference at check-in</p>
+                                    <p class="mb-1">✅ Payment upon arrival</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1">🕐 Check-in: 2:00 PM</p>
+                                    <p class="mb-1">🕚 Check-out: 11:00 AM</p>
+                                    <p class="mb-0">📞 Contact us for changes</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <a href="/" class="btn btn-primary mr-2">
+                                <i class="fa fa-home"></i> Back to Home
+                            </a>
+                            <a href="/our_rooms" class="btn btn-warning mr-2">
+                                <i class="fa fa-bed"></i> Book Another Room
+                            </a>
+                            <button onclick="printBooking()" class="btn btn-success">
+                                <i class="fa fa-print"></i> Print Confirmation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	<!-- End success -->
+
+    <!-- Print Styles -->
+    <style>
+        @media print {
+            .navbar, .footer, .all-page-title, .btn, .text-right {
+                display: none !important;
+            }
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+            }
+            .card-header {
+                background: #008080 !important;
+                color: white !important;
+            }
+            body {
+                background: white !important;
+            }
+            .container {
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+
+    <script>
+        function printBooking() {
+            const printContent = document.getElementById('bookingConfirmation').innerHTML;
+            const originalContent = document.body.innerHTML;
+
+            document.body.innerHTML = `
+                <div class="container">
+                    <div class="text-center mb-3">
+                        <h2>Booking Confirmation</h2>
+                        <p>Reference: {{ booking.booking_reference }}</p>
+                        <hr>
+                    </div>
+                    ${printContent}
+                    <div class="text-center mt-4">
+                        <p><small>Printed on: ${new Date().toLocaleString()}</small></p>
+                    </div>
+                </div>
+            `;
+
+            window.print();
+            document.body.innerHTML = originalContent;
+            window.location.reload();
+        }
+
+        function emailConfirmation() {
+            if (confirm('Send confirmation email again to {{ booking.guest_email }}?')) {
+                fetch('/bookings/send-email-confirmation/{{ booking.booking_reference }}/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Confirmation email sent successfully!');
+                    } else {
+                        alert('Error sending email: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    alert('Error sending email. Please try again.');
+                });
+            }
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}

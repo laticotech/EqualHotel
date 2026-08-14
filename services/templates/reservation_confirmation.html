@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #008080; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { padding: 30px; background: #f9f9f9; }
+        .reservation-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #008080; }
+        .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; border-top: 1px solid #ddd; }
+        .detail-item { margin-bottom: 10px; }
+        .detail-label { font-weight: bold; color: #008080; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Reservation Confirmed!</h1>
+            <p>Thank you for choosing our hotel services</p>
+        </div>
+
+        <div class="content">
+            <p>Dear <strong>{{ reservation.guest_name }}</strong>,</p>
+
+            <p>Your service reservation has been successfully confirmed. We're looking forward to serving you!</p>
+
+            <div class="reservation-details">
+                <h3 style="color: #008080; margin-top: 0;">Reservation Details</h3>
+
+                <div class="detail-item">
+                    <span class="detail-label">Reservation Number:</span> {{ reservation.reservation_number }}
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Service:</span> {{ service.name }}
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Date:</span> {{ reservation.reservation_date }}
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Time:</span> {{ reservation.reservation_time }}
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Number of Guests:</span> {{ reservation.number_of_guests }}
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Status:</span> <span style="color: green; font-weight: bold;">{{ reservation.get_status_display }}</span>
+                </div>
+
+                {% if reservation.special_requests %}
+                <div class="detail-item">
+                    <span class="detail-label">Special Requests:</span> {{ reservation.special_requests }}
+                </div>
+                {% endif %}
+            </div>
+
+            <p><strong>Important Notes:</strong></p>
+            <ul>
+                <li>Please arrive 10-15 minutes before your scheduled time</li>
+                <li>Bring this confirmation with you</li>
+                <li>Contact us if you need to make any changes</li>
+            </ul>
+
+            <p>We look forward to providing you with an exceptional experience!</p>
+
+            <p>Best regards,<br>
+            <strong>The Hotel Team</strong></p>
+        </div>
+
+        <div class="footer">
+            <p>This is an automated confirmation message. Please do not reply to this email.</p>
+            <p>If you have any questions, please contact our front desk.</p>
+        </div>
+    </div>
+</body>
+</html>

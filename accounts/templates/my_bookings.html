@@ -1,0 +1,187 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}My Bookings - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>MY BOOKINGS</h1>
+                <p>Manage your room reservations</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            {% if messages %}
+            <div class="messages mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-teal text-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">My Room Bookings</h4>
+                        <span class="badge bg-light text-dark">{{ bookings.count }} booking{{ bookings.count|pluralize }}</span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if bookings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Booking Reference</th>
+                                    <th>Room</th>
+                                    <th>Check-in</th>
+                                    <th>Check-out</th>
+                                    <th>Guests</th>
+                                    <th>Total Price</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ booking.booking_reference }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ booking.created_at|date:"M d, Y" }}</small>
+                                    </td>
+                                    <td>
+                                        {{ booking.room.room_type }} 
+                                        <br>
+                                        <small class="text-muted">Room {{ booking.room.room_number }}</small>
+                                    </td>
+                                    <td>
+                                        {{ booking.check_in|date:"M d, Y" }}
+                                    </td>
+                                    <td>
+                                        {{ booking.check_out|date:"M d, Y" }}
+                                    </td>
+                                    <td>
+                                        {{ booking.adults }} adult{{ booking.adults|pluralize }}
+                                        {% if booking.children %}
+                                        <br>
+                                        <small>{{ booking.children }} child{{ booking.children|pluralize }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>${{ booking.total_price }}</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if booking.status == 'confirmed' %}bg-success
+                                            {% elif booking.status == 'pending' %}bg-warning
+                                            {% elif booking.status == 'checked_in' %}bg-info
+                                            {% elif booking.status == 'checked_out' %}bg-secondary
+                                            {% elif booking.status == 'cancelled' %}bg-danger
+                                            {% else %}bg-light text-dark{% endif %}">
+                                            {{ booking.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'booking_detail' booking.booking_reference %}" 
+                                               class="btn btn-outline-teal" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if booking.status in "pending confirmed" %}  <!-- FIXED: Changed to use string with spaces -->
+                                            <a href="{% url 'cancel_booking' booking.booking_reference %}" 
+                                               class="btn btn-outline-danger" title="Cancel Booking">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="fas fa-calendar-times fa-3x text-muted"></i>
+                        </div>
+                        <h4 class="text-muted">No Bookings Found</h4>
+                        <p class="text-muted mb-4">You haven't made any room bookings yet.</p>
+                        <a href="{% url 'accommodations' %}" class="btn btn-teal">
+                            <i class="fas fa-bed me-2"></i>Book a Room Now
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Booking Status Legend -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h6 class="card-title mb-3">Booking Status Legend</h6>
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <span class="badge bg-warning me-2">●</span>
+                            <small>Pending Payment - Awaiting payment confirmation</small>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <span class="badge bg-success me-2">●</span>
+                            <small>Confirmed - Booking is confirmed</small>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <span class="badge bg-info me-2">●</span>
+                            <small>Checked In - Currently staying</small>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <span class="badge bg-secondary me-2">●</span>
+                            <small>Checked Out - Stay completed</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.btn-outline-teal {
+    color: #008080;
+    border-color: #008080;
+}
+
+.btn-outline-teal:hover {
+    background-color: #008080;
+    color: white;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+</style>
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}

@@ -1,0 +1,336 @@
+{% extends 'admin/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Reports & Analytics - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Reports & Analytics</h1>
+        <div class="d-none d-sm-inline-block">
+            <span class="text-muted">Period: {{ start_date }} to {{ end_date }}</span>
+        </div>
+    </div>
+
+    <!-- Date Range Filter -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-info">Date Range</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    <input type="date" name="start_date" id="start_date" class="form-control" 
+                           value="{{ start_date|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="end_date" class="form-label">End Date</label>
+                    <input type="date" name="end_date" id="end_date" class="form-control" 
+                           value="{{ end_date|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <div>
+                        <button type="submit" class="btn btn-info">Generate Report</button>
+                        <a href="{% url 'admin_reports' %}" class="btn btn-secondary">Reset</a>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Quick Periods</label>
+                    <div>
+                        <a href="?start_date={{ today|date:'Y-m-d' }}&end_date={{ today|date:'Y-m-d' }}" 
+                           class="btn btn-outline-primary btn-sm">Today</a>
+                        <a href="?start_date={{ week_ago|date:'Y-m-d' }}&end_date={{ today|date:'Y-m-d' }}" 
+                           class="btn btn-outline-primary btn-sm">Last 7 Days</a>
+                        <a href="?start_date={{ month_ago|date:'Y-m-d' }}&end_date={{ today|date:'Y-m-d' }}" 
+                           class="btn btn-outline-primary btn-sm">Last 30 Days</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="row">
+        <!-- Revenue Summary -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Revenue</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">GHS {{ total_revenue }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Revenue -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Booking Revenue</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">GHS {{ payment_stats.booking_payments }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-bed fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Revenue -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Service Revenue</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">GHS {{ payment_stats.service_payments }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-concierge-bell fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Bookings -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Total Bookings</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ booking_stats.total }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Reports -->
+    <div class="row">
+        <!-- Booking Statistics -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Booking Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Count</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Total Bookings</td>
+                                    <td>{{ booking_stats.total }}</td>
+                                    <td>100%</td>
+                                </tr>
+                                <tr>
+                                    <td>Confirmed Bookings</td>
+                                    <td>{{ booking_stats.confirmed }}</td>
+                                    <td>
+                                        {% if booking_stats.total > 0 %}
+                                        {{ booking_stats.confirmed|floatformat:0 }}%
+                                        {% else %}
+                                        0%
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Pending Bookings</td>
+                                    <td>{{ booking_stats.pending }}</td>
+                                    <td>
+                                        {% if booking_stats.total > 0 %}
+                                        {{ booking_stats.pending|floatformat:0 }}%
+                                        {% else %}
+                                        0%
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr class="table-success">
+                                    <td><strong>Total Revenue</strong></td>
+                                    <td colspan="2" class="fw-bold text-success">
+                                        GHS {{ booking_stats.total_revenue|default:0 }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue Breakdown -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">Revenue Breakdown</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Source</th>
+                                    <th>Amount</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Room Bookings</td>
+                                    <td>GHS {{ payment_stats.booking_payments }}</td>
+                                    <td>
+                                        {% if total_revenue > 0 %}
+                                        {{ payment_stats.booking_payments|floatformat:0 }}%
+                                        {% else %}
+                                        0%
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Service Reservations</td>
+                                    <td>GHS {{ payment_stats.service_payments }}</td>
+                                    <td>
+                                        {% if total_revenue > 0 %}
+                                        {{ payment_stats.service_payments|floatformat:0 }}%
+                                        {% else %}
+                                        0%
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr class="table-success">
+                                    <td><strong>Total Revenue</strong></td>
+                                    <td colspan="2" class="fw-bold text-success">
+                                        GHS {{ total_revenue }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Metrics -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info">Performance Metrics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-left-primary">
+                                <div class="card-body">
+                                    <h4 class="text-primary">{{ booking_stats.total }}</h4>
+                                    <p class="small text-muted">Total Bookings</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-left-success">
+                                <div class="card-body">
+                                    <h4 class="text-success">{{ booking_stats.confirmed }}</h4>
+                                    <p class="small text-muted">Confirmed Bookings</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-left-warning">
+                                <div class="card-body">
+                                    <h4 class="text-warning">{{ booking_stats.pending }}</h4>
+                                    <p class="small text-muted">Pending Bookings</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-left-info">
+                                <div class="card-body">
+                                    <h4 class="text-info">{{ total_revenue }}</h4>
+                                    <p class="small text-muted">Total Revenue (GHS)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Options -->
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-info">Export Reports</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-file-excel fa-2x text-success mb-3"></i>
+                            <h5>Excel Export</h5>
+                            <p class="small text-muted">Export booking and revenue data to Excel</p>
+                            <button class="btn btn-success btn-sm">
+                                <i class="fas fa-download me-1"></i> Download Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-file-pdf fa-2x text-danger mb-3"></i>
+                            <h5>PDF Report</h5>
+                            <p class="small text-muted">Generate a comprehensive PDF report</p>
+                            <button class="btn btn-danger btn-sm">
+                                <i class="fas fa-download me-1"></i> Download PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-chart-bar fa-2x text-primary mb-3"></i>
+                            <h5>Custom Report</h5>
+                            <p class="small text-muted">Create custom reports with filters</p>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-cog me-1"></i> Customize
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

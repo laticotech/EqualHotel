@@ -1,0 +1,148 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}{{ service.name }} - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<style>
+    /* Service Styles */
+.service-card {
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 128, 128, 0.1);
+}
+
+.btn-outline-teal {
+    border-color: #008080;
+    color: #008080;
+}
+
+.btn-outline-teal:hover {
+    background-color: #008080;
+    border-color: #008080;
+    color: white;
+}
+
+.teal-bg {
+    background-color: #008080 !important;
+}
+
+.success-icon {
+    animation: bounceIn 0.6s ease;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+</style>
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>{{ service.name|upper }}</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Service Detail -->
+<div class="service-detail py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    {% if service.image %}
+                    <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}" style="height: 400px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h2 class="card-title">{{ service.name }}</h2>
+                        <div class="service-meta mb-3">
+                            {% if service.is_free %}
+                            <span class="badge bg-success fs-6">Free Service</span>
+                            {% else %}
+                            <span class="price h4 teal-text">GHC {{ service.price }}</span>
+                            {% endif %}
+                            <span class="badge bg-secondary ms-2">{{ service.get_category_display }}</span>
+                        </div>
+                        
+                        <div class="service-info mb-4">
+                            {% if service.available_days %}
+                            <p><strong><i class="fas fa-calendar me-2 teal-text"></i>Available:</strong> {{ service.available_days }}</p>
+                            {% endif %}
+                            {% if service.available_times %}
+                            <p><strong><i class="fas fa-clock me-2 teal-text"></i>Timing:</strong> {{ service.available_times }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="service-description">
+                            <h4>Description</h4>
+                            <p class="lead">{{ service.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="booking-widget card border-0 shadow-sm sticky-top" style="top: 20px;">
+                    <div class="card-header teal-bg text-white">
+                        <h5 class="mb-0 text-center" style="color: white;">Book This Service</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if service.requires_booking %}
+                        <a href="{% url 'service_reservation' service.id %}" class="btn btn-sm btn-outline-teal w-100 btn-lg">
+                            Make Reservation
+                        </a>
+                        {% else %}
+                        <p class="text-muted">No reservation required for this service.</p>
+                        <p class="small">Please contact concierge for more information.</p>
+                        {% endif %}
+                        
+                        <div class="service-highlights mt-4">
+                            <h6>Service Highlights</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i> Premium Quality</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Professional Staff</li>
+                                {% if service.is_free %}
+                                <li><i class="fas fa-check text-success me-2"></i> Complimentary</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if related_services %}
+                <div class="related-services mt-4">
+                    <h5 class="teal-text">Related Services</h5>
+                    {% for related in related_services %}
+                    <div class="card mb-2">
+                        <div class="card-body py-2">
+                            <h6 class="card-title mb-1">{{ related.name }}</h6>
+                            <div class="d-flex justify-content-between align-items-center">
+                                {% if related.is_free %}
+                                <span class="badge bg-success">Free</span>
+                                {% else %}
+                                <small class="text-muted">GHC {{ related.price }}</small>
+                                {% endif %}
+                                <a href="{% url 'service_detail' related.id %}" class="btn btn-sm btn-outline-teal">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Service Detail -->
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}

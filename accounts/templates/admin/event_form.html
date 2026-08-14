@@ -1,0 +1,472 @@
+{% extends 'admin/dashboard_base.html' %}
+
+{% block title %}{{ title }} - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2">{{ title }}</h1>
+                <a href="{% url 'admin_events' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Events
+                </a>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title mb-0 text-teal">
+                                <i class="fas fa-calendar-plus me-2"></i>Event Details
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" novalidate>
+                                {% csrf_token %}
+
+                                {% if form.non_field_errors %}
+                                <div class="alert alert-danger alert-dismissible fade show">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endif %}
+
+                                <!-- Basic Information Section -->
+                                <div class="form-section mb-4">
+                                    <h6 class="section-title text-teal mb-3">
+                                        <i class="fas fa-info-circle me-2"></i>Basic Information
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">
+                                                Event Title <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light">
+                                                    <i class="fas fa-heading text-teal"></i>
+                                                </span>
+                                                <input type="text"
+                                                       name="{{ form.title.name }}"
+                                                       id="{{ form.title.id_for_label }}"
+                                                       class="form-control {% if form.title.errors %}is-invalid{% endif %}"
+                                                       value="{{ form.title.value|default:'' }}"
+                                                       placeholder="Enter event title"
+                                                       required>
+                                            </div>
+                                            {% if form.title.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in form.title.errors %}
+                                                {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.event_type.id_for_label }}" class="form-label fw-semibold">
+                                                Event Type <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light">
+                                                    <i class="fas fa-tag text-teal"></i>
+                                                </span>
+                                                <select name="{{ form.event_type.name }}"
+                                                        id="{{ form.event_type.id_for_label }}"
+                                                        class="form-select {% if form.event_type.errors %}is-invalid{% endif %}"
+                                                        required>
+                                                    <option value="">Select event type...</option>
+                                                    {% for value, label in form.event_type.field.choices %}
+                                                    <option value="{{ value }}" {% if form.event_type.value == value %}selected{% endif %}>
+                                                        {{ label }}
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            {% if form.event_type.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in form.event_type.errors %}
+                                                {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold">
+                                            Description <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light align-items-start">
+                                                <i class="fas fa-align-left text-teal mt-1"></i>
+                                            </span>
+                                            <textarea name="{{ form.description.name }}"
+                                                      id="{{ form.description.id_for_label }}"
+                                                      class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+                                                      rows="5"
+                                                      placeholder="Describe your event in detail..."
+                                                      required>{{ form.description.value|default:'' }}</textarea>
+                                        </div>
+                                        {% if form.description.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.description.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Date & Time Section -->
+                                <div class="form-section mb-4">
+                                    <h6 class="section-title text-teal mb-3">
+                                        <i class="fas fa-clock me-2"></i>Date & Time
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.start_date.id_for_label }}" class="form-label fw-semibold">
+                                                Start Date & Time <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light">
+                                                    <i class="fas fa-play text-teal"></i>
+                                                </span>
+                                                <input type="datetime-local"
+                                                       name="{{ form.start_date.name }}"
+                                                       id="{{ form.start_date.id_for_label }}"
+                                                       class="form-control {% if form.start_date.errors %}is-invalid{% endif %}"
+                                                       value="{{ form.start_date.value|date:'Y-m-d\TH:i'|default:'' }}"
+                                                       required>
+                                            </div>
+                                            {% if form.start_date.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in form.start_date.errors %}
+                                                {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.end_date.id_for_label }}" class="form-label fw-semibold">
+                                                End Date & Time <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light">
+                                                    <i class="fas fa-stop text-teal"></i>
+                                                </span>
+                                                <input type="datetime-local"
+                                                       name="{{ form.end_date.name }}"
+                                                       id="{{ form.end_date.id_for_label }}"
+                                                       class="form-control {% if form.end_date.errors %}is-invalid{% endif %}"
+                                                       value="{{ form.end_date.value|date:'Y-m-d\TH:i'|default:'' }}"
+                                                       required>
+                                            </div>
+                                            {% if form.end_date.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in form.end_date.errors %}
+                                                {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Location & Image Section -->
+                                <div class="form-section mb-4">
+                                    <h6 class="section-title text-teal mb-3">
+                                        <i class="fas fa-map-marker-alt me-2"></i>Location & Media
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.location.id_for_label }}" class="form-label fw-semibold">
+                                                Location <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light">
+                                                    <i class="fas fa-location-dot text-teal"></i>
+                                                </span>
+                                                <input type="text"
+                                                       name="{{ form.location.name }}"
+                                                       id="{{ form.location.id_for_label }}"
+                                                       class="form-control {% if form.location.errors %}is-invalid{% endif %}"
+                                                       value="{{ form.location.value|default:'' }}"
+                                                       placeholder="Enter event location"
+                                                       required>
+                                            </div>
+                                            {% if form.location.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in form.location.errors %}
+                                                {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.image.id_for_label }}" class="form-label fw-semibold">
+                                                Event Image
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light">
+                                                    <i class="fas fa-image text-teal"></i>
+                                                </span>
+                                                <input type="file"
+                                                       name="{{ form.image.name }}"
+                                                       id="{{ form.image.id_for_label }}"
+                                                       class="form-control {% if form.image.errors %}is-invalid{% endif %}"
+                                                       accept="image/*">
+                                            </div>
+                                            {% if form.image.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in form.image.errors %}
+                                                {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+
+                                            {% if event and event.image %}
+                                            <div class="mt-3 p-3 bg-light rounded">
+                                                <small class="text-muted d-block mb-2">Current image:</small>
+                                                <img src="{{ event.image.url }}" alt="Current event image"
+                                                     class="rounded shadow-sm"
+                                                     style="max-width: 200px; max-height: 150px; object-fit: cover;">
+                                                <div class="mt-2">
+                                                    <small class="text-muted">{{ event.image.name }}</small>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Event Settings Section -->
+                                <div class="form-section mb-4">
+                                    <h6 class="section-title text-teal mb-3">
+                                        <i class="fas fa-cog me-2"></i>Event Settings
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="{{ form.max_attendees.id_for_label }}" class="form-label fw-semibold">
+                                                Maximum Attendees
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light">
+                                                    <i class="fas fa-users text-teal"></i>
+                                                </span>
+                                                <input type="number"
+                                                       name="{{ form.max_attendees.name }}"
+                                                       id="{{ form.max_attendees.id_for_label }}"
+                                                       class="form-control {% if form.max_attendees.errors %}is-invalid{% endif %}"
+                                                       value="{{ form.max_attendees.value|default:'0' }}"
+                                                       min="0"
+                                                       step="1">
+                                            </div>
+                                            <div class="form-text text-muted small">
+                                                <i class="fas fa-info-circle me-1"></i>Set to 0 for unlimited attendees
+                                            </div>
+                                            {% if form.max_attendees.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in form.max_attendees.errors %}
+                                                {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="col-md-4 mb-3">
+                                            <label for="{{ form.price.id_for_label }}" class="form-label fw-semibold">
+                                                Price ($)
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light">
+                                                    <i class="fas fa-dollar-sign text-teal"></i>
+                                                </span>
+                                                <input type="number"
+                                                       name="{{ form.price.name }}"
+                                                       id="{{ form.price.id_for_label }}"
+                                                       class="form-control {% if form.price.errors %}is-invalid{% endif %}"
+                                                       value="{{ form.price.value|default:'0.00' }}"
+                                                       min="0"
+                                                       step="0.01">
+                                            </div>
+                                            <div class="form-text text-muted small">
+                                                <i class="fas fa-info-circle me-1"></i>Set to 0 for free event
+                                            </div>
+                                            {% if form.price.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in form.price.errors %}
+                                                {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="col-md-4 mb-3">
+                                            <label for="{{ form.status.id_for_label }}" class="form-label fw-semibold">
+                                                Status
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light">
+                                                    <i class="fas fa-flag text-teal"></i>
+                                                </span>
+                                                <select name="{{ form.status.name }}"
+                                                        id="{{ form.status.id_for_label }}"
+                                                        class="form-select {% if form.status.errors %}is-invalid{% endif %}">
+                                                    {% for value, label in form.status.field.choices %}
+                                                    <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>
+                                                        {{ label }}
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            {% if form.status.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in form.status.errors %}
+                                                {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input type="checkbox"
+                                                   name="{{ form.is_active.name }}"
+                                                   id="{{ form.is_active.id_for_label }}"
+                                                   class="form-check-input"
+                                                   {% if form.is_active.value %}checked{% endif %}>
+                                            <label class="form-check-label fw-semibold" for="{{ form.is_active.id_for_label }}">
+                                                <i class="fas fa-toggle-on me-2 text-teal"></i>Active Event
+                                            </label>
+                                        </div>
+                                        <div class="form-text text-muted small">
+                                            Inactive events won't be visible to the public
+                                        </div>
+                                        {% if form.is_active.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.is_active.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Submit Buttons -->
+                                <div class="form-section pt-3 border-top">
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <a href="{% url 'admin_events' %}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-times me-2"></i>Cancel
+                                        </a>
+                                        <button type="submit" class="btn btn-teal">
+                                            <i class="fas fa-save me-2"></i>
+                                            {% if event %}Update Event{% else %}Create Event{% endif %}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title mb-0 text-teal">
+                                <i class="fas fa-lightbulb me-2"></i>Tips & Guidelines
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info border-0">
+                                <h6 class="alert-heading mb-3">Event Creation Tips</h6>
+                                <ul class="small mb-0 ps-3">
+                                    <li class="mb-2">Use descriptive titles that attract attention</li>
+                                    <li class="mb-2">Add high-quality images for better engagement</li>
+                                    <li class="mb-2">Set realistic attendee limits based on venue capacity</li>
+                                    <li class="mb-2">Provide clear location details with directions if needed</li>
+                                    <li class="mb-2">Use the description to highlight key features and benefits</li>
+                                    <li class="mb-2">Set appropriate pricing that reflects event value</li>
+                                    <li>Choose the right status to manage event visibility</li>
+                                </ul>
+                            </div>
+
+                            {% if event %}
+                            <div class="alert alert-warning border-0 mt-3">
+                                <h6 class="alert-heading mb-2">Editing Event</h6>
+                                <p class="small mb-0">Changes will be reflected immediately on the public event page.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section {
+        padding: 1.5rem;
+        background: #fff;
+        border-radius: 0.5rem;
+        border: 1px solid #e9ecef;
+        margin-bottom: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #008080;
+    }
+
+    .text-teal {
+        color: #008080 !important;
+    }
+
+    .btn-teal {
+        background-color: #008080;
+        border-color: #008080;
+        color: white;
+    }
+
+    .btn-teal:hover {
+        background-color: #006666;
+        border-color: #006666;
+        color: white;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #008080;
+        box-shadow: 0 0 0 0.2rem rgba(0, 128, 128, 0.25);
+    }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+    }
+
+    .form-check-input:checked {
+        background-color: #008080;
+        border-color: #008080;
+    }
+
+    .card {
+        border: none;
+        border-radius: 0.75rem;
+    }
+
+    .card-header {
+        border-radius: 0.75rem 0.75rem 0 0 !important;
+    }
+</style>
+{% endblock %}

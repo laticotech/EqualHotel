@@ -1,0 +1,255 @@
+{% extends 'homebase.html' %}
+{% load static %}
+
+{% block title %}Blog - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+
+<!-- Start All Pages -->
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>OUR BLOG</h1>
+                <p>Latest news and updates from {{ hotel.name }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Blog Section -->
+<div class="blog-box">
+    <div class="container">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Search and Filter -->
+                <div class="blog-header mb-4">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <form method="get" class="search-form">
+                                <div class="input-group">
+                                    <input type="text" name="search" class="form-control" placeholder="Search blog posts..." value="{{ search_query }}">
+                                    <button class="btn btn-teal" type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" onchange="location = this.value;">
+                                <option value="{% url 'blog_list' %}">All Categories</option>
+                                {% for category in categories %}
+                                <option value="{% url 'blog_category' category.slug %}"
+                                        {% if selected_category == category.slug %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blog Posts Grid -->
+                <div class="row">
+                    {% for post in posts %}
+                    <div class="col-md-6 mb-4">
+                        <div class="blog-card card border-0 shadow-sm h-100">
+                            <div class="blog-image">
+                                <img src="{{ post.featured_image.url }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                                {% if post.category %}
+                                <div class="category-badge">
+                                    {{ post.category.name }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <!-- FIXED: Changed to blog_detail with post.slug -->
+                                    <a href="{% url 'blog_detail' post.slug %}" class="text-dark text-decoration-none">
+                                        {{ post.title }}
+                                    </a>
+                                </h5>
+                                <div class="blog-meta mb-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>{{ post.author }}
+                                        <i class="fas fa-calendar ms-2 me-1"></i>{{ post.published_date|date:"M d, Y" }}
+                                    </small>
+                                </div>
+                                <p class="card-text">
+                                    {% if post.excerpt %}
+                                        {{ post.excerpt }}
+                                    {% else %}
+                                        {{ post.content|striptags|truncatewords:20 }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="card-footer bg-transparent border-0">
+                                <!-- FIXED: Changed to blog_detail with post.slug -->
+                                <a href="{% url 'blog_detail' post.slug %}" class="btn btn-teal btn-sm">
+                                    Read More <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Blog Posts Found</h4>
+                            <p class="text-muted">
+                                {% if search_query %}
+                                    No posts found for "{{ search_query }}"
+                                {% else %}
+                                    Check back soon for new blog posts!
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if posts.has_other_pages %}
+                <nav aria-label="Blog pagination" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if posts.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ posts.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">Previous</a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in posts.paginator.page_range %}
+                        <li class="page-item {% if posts.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">{{ num }}</a>
+                        </li>
+                        {% endfor %}
+
+                        {% if posts.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ posts.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">Next</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Categories Widget -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-teal text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-folder me-2"></i>Categories
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <a href="{% url 'blog_list' %}" class="text-decoration-none d-flex justify-content-between align-items-center">
+                                    <span>All Categories</span>
+                                    <span class="badge bg-teal">{{ posts.paginator.count }}</span>
+                                </a>
+                            </li>
+                            {% for category in categories %}
+                            <li class="mb-2">
+                                <a href="{% url 'blog_category' category.slug %}" class="text-decoration-none d-flex justify-content-between align-items-center">
+                                    <span>{{ category.name }}</span>
+                                    <span class="badge bg-light text-dark">{{ category.blogpost_set.count }}</span>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Recent Posts Widget -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-teal text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-clock me-2"></i>Recent Posts
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% for recent_post in recent_posts %}
+                        <div class="recent-post mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <h6 class="mb-1">
+                                <!-- FIXED: Changed to blog_detail with recent_post.slug -->
+                                <a href="{% url 'blog_detail' recent_post.slug %}" class="text-decoration-none">
+                                    {{ recent_post.title }}
+                                </a>
+                            </h6>
+                            <small class="text-muted">{{ recent_post.published_date|date:"M d, Y" }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Blog Section -->
+
+{% endblock %}
+{% block foot %}{% include 'footer.html' %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.blog-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.blog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+
+.blog-image {
+    position: relative;
+    overflow: hidden;
+}
+
+.category-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #008080;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.blog-meta {
+    font-size: 0.85rem;
+}
+
+.recent-post h6 {
+    font-size: 0.9rem;
+    line-height: 1.3;
+}
+
+.search-form .input-group {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.btn-teal {
+    background: #008080;
+    border-color: #008080;
+    color: white;
+}
+
+.btn-teal:hover {
+    background: #006666;
+    border-color: #006666;
+    color: white;
+}
+
+.bg-teal {
+    background-color: #008080 !important;
+}
+</style>
+{% endblock %}

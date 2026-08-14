@@ -1,0 +1,356 @@
+{%load static%}
+<style>
+/* Comprehensive Dropdown Fix */
+.navbar {
+    position: relative;
+    z-index: 1030;
+}
+
+.navbar-nav .nav-item {
+    position: relative;
+}
+
+.navbar-nav .dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    margin-top: 0 !important;
+    z-index: 1060 !important;
+    display: none;
+}
+
+.navbar-nav .dropdown-menu.show {
+    display: block !important;
+}
+
+/* User dropdown alignment */
+.dropdown-menu-right {
+    right: 0 !important;
+    left: auto !important;
+}
+
+/* Ensure dropdowns are visible and properly styled */
+.dropdown-menu {
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: 0.25rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    background: white;
+    min-width: 200px;
+}
+
+/* Dropdown item styling */
+.dropdown-item {
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+    color: #333;
+}
+
+.dropdown-item:hover {
+    background-color: #008080;
+    color: white;
+    text-decoration: none;
+}
+
+/* Fix for Bootstrap 4 dropdown positioning */
+.navbar-expand-lg .navbar-nav .dropdown-menu {
+    position: absolute;
+}
+
+/* Mobile responsive fixes */
+@media (max-width: 991.98px) {
+    .navbar-nav .dropdown-menu {
+        position: static !important;
+        float: none;
+        border: none;
+        box-shadow: none;
+        background: transparent;
+    }
+
+    .dropdown-menu-right {
+        right: auto !important;
+    }
+}
+</style>
+
+<!-- Start header -->
+<header class="top-navbar">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                {% if hotel.logo %}
+                <img src="{{ hotel.logo.url }}" alt="{{ hotel.name }}" style="height:80px; width: auto; max-width: 200px;">
+                {% else %}
+                <img src="{% static 'images/default-logo.png' %}" alt="{{ hotel.name }}" style="height:80px; width: auto; max-width: 200px;">
+                {% endif %}
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbars-rs-food" aria-controls="navbars-rs-food" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbars-rs-food">
+                <ul class="navbar-nav ml-auto">
+                    {%if home%}
+                    <li class="nav-item active"><a class="nav-link" href="/">Home</a></li>
+                    {%else%}
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    {%endif%}
+
+                    {%if room%}
+                    <li class="nav-item active"><a class="nav-link" href="/accommodations">Rooms & Suites</a></li>
+                    {%else%}
+                    <li class="nav-item"><a class="nav-link" href="/accommodations">Rooms & Suites</a></li>
+                    {%endif%}
+
+<!--                    &lt;!&ndash; Book Now Button &ndash;&gt;-->
+<!--                    <li class="nav-item">-->
+<!--                        <a class="nav-link book-now-btn" href="{% url 'check_availability' %}">-->
+<!--                            <i class="fa fa-calendar-check me-1"></i>Book Now-->
+<!--                        </a>-->
+<!--                    </li>-->
+
+                    {%if amenity%}
+                    <li class="nav-item active"><a class="nav-link" href="/amenities">Amenities</a></li>
+                    {%else%}
+                    <li class="nav-item"><a class="nav-link" href="/amenities">Amenities</a></li>
+                    {%endif%}
+
+                    {%if served%}
+                    <li class="nav-item active"><a class="nav-link" href="/services">Services</a></li>
+                    {%else%}
+                    <li class="nav-item"><a class="nav-link" href="/services">Services</a></li>
+                    {%endif%}
+
+                    {%if our_events%}
+                    <li class="nav-item active"><a class="nav-link" href="/events">Events</a></li>
+                    {%else%}
+                    <li class="nav-item"><a class="nav-link" href="/events">Events</a></li>
+                    {%endif%}
+
+
+
+                    {%if more%}
+                        <li class="nav-item dropdown active">
+                            <a class="nav-link dropdown-toggle" href="#" id="dropdown-a" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                More
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdown-a">
+                                <a class="dropdown-item" href="/gallery_list">
+                                    <i class="fas fa-images me-2"></i>Gallery
+                                </a>
+                                <a class="dropdown-item" href="/blog">  <!-- Added Blog link -->
+                                    <i class="fas fa-blog me-2"></i>Blog
+                                </a>
+                                <a class="dropdown-item" href="/about">
+                                    <i class="fas fa-info-circle me-2"></i>About Us
+                                </a>
+                                <a class="dropdown-item" href="/contact">
+                                    <i class="fas fa-envelope me-2"></i>Contact
+                                </a>
+                                <a class="dropdown-item" href="/location">
+                                    <i class="fas fa-map-marker-alt me-2"></i>Location
+                                </a>
+                            </div>
+                        </li>
+                    {%else%}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="dropdown-b" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                More
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdown-b">  <!-- Fixed ID -->
+                                <a class="dropdown-item" href="/gallery_list">
+                                    <i class="fas fa-images me-2"></i>Gallery
+                                </a>
+                                <a class="dropdown-item" href="/blog">  <!-- Added Blog link -->
+                                    <i class="fas fa-blog me-2"></i>Blog
+                                </a>
+                                <a class="dropdown-item" href="/about">
+                                    <i class="fas fa-info-circle me-2"></i>About Us
+                                </a>
+                                <a class="dropdown-item" href="/contact">
+                                    <i class="fas fa-envelope me-2"></i>Contact
+                                </a>
+                                <a class="dropdown-item" href="/location">
+                                    <i class="fas fa-map-marker-alt me-2"></i>Location
+                                </a>
+                            </div>
+                        </li>
+                    {%endif%}
+
+                 {% if user.is_authenticated %}
+                    {% if user.is_staff or user.is_superuser %}
+                        <!-- Admin/Staff Menu -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle border border-teal rounded-pill px-3" href="#" id="adminDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border-color: #008080 !important;">
+                                <i class="fa fa-user-shield me-1"></i>
+                                Admin Panel
+                                {% if total_admin_notifications > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6em;">
+                                    {{ total_admin_notifications }}
+                                </span>
+                                {% endif %}
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="adminDropdown">
+                                <a class="dropdown-item" href="{% url 'dashboard' %}">
+                                    <i class="fa fa-tachometer-alt me-2"></i>Dashboard
+                                    {% if total_admin_notifications > 0 %}
+                                    <span class="badge bg-danger float-end">{{ total_admin_notifications }}</span>
+                                    {% endif %}
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{% url 'admin_bookings' %}">
+                                    <i class="fa fa-bed me-2"></i>Bookings
+                                    {% if pending_bookings_count > 0 %}
+                                    <span class="badge bg-warning float-end">{{ pending_bookings_count }}</span>
+                                    {% endif %}
+                                </a>
+                                <a class="dropdown-item" href="{% url 'admin_reservations' %}">
+                                    <i class="fa fa-concierge-bell me-2"></i>Reservations
+                                    {% if pending_reservations_count > 0 %}
+                                    <span class="badge bg-warning float-end">{{ pending_reservations_count }}</span>
+                                    {% endif %}
+                                </a>
+                                <a class="dropdown-item" href="{% url 'admin_messages' %}">
+                                    <i class="fa fa-envelope me-2"></i>Messages
+                                    {% if unread_messages_count > 0 %}
+                                    <span class="badge bg-primary float-end">{{ unread_messages_count }}</span>
+                                    {% endif %}
+                                </a>
+                                <a class="dropdown-item" href="{% url 'admin_payments' %}">
+                                    <i class="fa fa-credit-card me-2"></i>Payments
+                                    {% if pending_payments_count > 0 %}
+                                    <span class="badge bg-warning float-end">{{ pending_payments_count }}</span>
+                                    {% endif %}
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{% url 'profile' %}">
+                                    <i class="fa fa-user me-2"></i>My Profile
+                                </a>
+                                <a class="dropdown-item" href="/admin/" target="_blank">
+                                    <i class="fa fa-cog me-2"></i>Main Admin
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{% url 'logout' %}">
+                                    <i class="fa fa-sign-out-alt me-2"></i>Logout
+                                </a>
+                            </div>
+                        </li>
+                    {% else %}
+                        <!-- Regular User Menu -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle border border-teal rounded-pill px-3" href="#" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border-color: #008080 !important;">
+                                {% if user.profile and user.profile.profile_pic and user.profile.profile_pic.url %}
+                                    <img src="{{ user.profile.profile_pic.url }}" style="height:32px; width:32px; border-radius:50%; margin-right:8px;">
+                                {% else %}
+                                    <img src="{% static 'images/default-avatar.png' %}" style="height:32px; width:32px; border-radius:50%; margin-right:8px;">
+                                {% endif %}
+                                {{ user.first_name|default:user.username }}
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="{% url 'profile' %}">
+                                    <i class="fa fa-user me-2"></i>My Profile
+                                </a>
+                                <a class="dropdown-item" href="{% url 'my_bookings' %}">
+                                    <i class="fa fa-calendar me-2"></i>My Bookings
+                                </a>
+                                <a class="dropdown-item" href="{% url 'my_reservations' %}">
+                                    <i class="fa fa-concierge-bell me-2"></i>Service Reservations
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{% url 'logout' %}">
+                                    <i class="fa fa-sign-out-alt me-2"></i>Logout
+                                </a>
+                            </div>
+                        </li>
+                        <!-- Notifications -->
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="{% url 'notifications' %}">
+                                <i class="fa fa-bell"></i>
+                                {% if total_pending_count > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{ total_pending_count }}
+                                    <span class="visually-hidden">unread notifications</span>
+                                </span>
+                                {% endif %}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <!-- Login/Signup -->
+                    <li class="nav-item">
+                        <a class="nav-link border border-teal rounded-pill px-3" href="{% url 'login' %}" style="border-color: #008080 !important;">
+                            <i class="fa fa-sign-in-alt me-1"></i>Login
+                        </a>
+                    </li>
+                {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<!-- End header -->
+
+<style>
+    /* Book Now Button Styles */
+    .book-now-btn {
+        color: #008080 !important;
+        font-weight: bold;
+        border: 2px solid #008080;
+        border-radius: 25px;
+        padding: 8px 20px;
+        margin: 0 5px;
+        transition: all 0.3s ease;
+        background: transparent;
+    }
+
+    .book-now-btn:hover {
+        background-color: #008080;
+        color: white !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 128, 128, 0.3);
+        text-decoration: none;
+    }
+
+    /* Logo fix */
+    .navbar-brand img {
+        height: 80px !important;
+        width: auto !important;
+        max-width: 200px;
+        object-fit: contain;
+    }
+
+    /* Ensure navbar items align properly */
+    .navbar-nav .nav-item {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Nav link spacing */
+    .navbar-nav .nav-link {
+        padding: 8px 15px !important;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 991px) {
+        .book-now-btn {
+            margin: 5px 0;
+            text-align: center;
+            display: block;
+            border-radius: 5px;
+        }
+
+        .navbar-nav .nav-item {
+            justify-content: center;
+        }
+
+        .navbar-nav .dropdown-menu {
+            text-align: center;
+        }
+    }
+    .border-teal {
+    border-color: #008080 !important;
+}
+
+.nav-link.border-teal:hover {
+    background-color: #008080;
+    color: white !important;
+}
+</style>

@@ -1,0 +1,213 @@
+{% extends 'admin/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Payments Dashboard - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Payments Dashboard</h1>
+        <div class="d-none d-sm-inline-block">
+            <span class="text-muted">Today: {% now "F d, Y" %}</span>
+        </div>
+    </div>
+
+    <!-- Revenue Statistics -->
+    <div class="row">
+        <!-- Total Revenue Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Revenue</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">GHS {{ total_revenue }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Revenue Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Booking Revenue</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">GHS {{ total_booking_revenue }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-bed fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Revenue Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Service Revenue</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">GHS {{ total_service_revenue }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-concierge-bell fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Payments Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pending Payments</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ pending_booking_payments_count|add:pending_service_payments_count }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'admin_booking_payments' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-bed me-2"></i>Manage Booking Payments
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'admin_service_payments' %}" class="btn btn-success btn-block">
+                                <i class="fas fa-concierge-bell me-2"></i>Manage Service Payments
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Payments -->
+    <div class="row">
+        <!-- Recent Booking Payments -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Booking Payments</h6>
+                    <a href="{% url 'admin_booking_payments' %}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_booking_payments %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Booking Ref</th>
+                                    <th>Guest</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in recent_booking_payments %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'edit_booking_payment' payment.id %}">
+                                            {{ payment.booking.booking_reference }}
+                                        </a>
+                                    </td>
+                                    <td>{{ payment.booking.guest_name }}</td>
+                                    <td>GHS {{ payment.amount_paid }}</td>
+                                    <td>
+                                        <span class="badge badge-{% if payment.payment_status == 'completed' %}success{% elif payment.payment_status == 'pending' %}warning{% else %}danger{% endif %}">
+                                            {{ payment.get_payment_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3">No recent booking payments</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Service Payments -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-success">Recent Service Payments</h6>
+                    <a href="{% url 'admin_service_payments' %}" class="btn btn-sm btn-success">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_service_payments %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Reservation No</th>
+                                    <th>Guest</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in recent_service_payments %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'edit_service_payment' payment.id %}">
+                                            {{ payment.service_reservation.reservation_number }}
+                                        </a>
+                                    </td>
+                                    <td>{{ payment.service_reservation.guest_name }}</td>
+                                    <td>GHS {{ payment.amount_paid }}</td>
+                                    <td>
+                                        <span class="badge badge-{% if payment.payment_status == 'completed' %}success{% elif payment.payment_status == 'pending' %}warning{% else %}danger{% endif %}">
+                                            {{ payment.get_payment_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-3">No recent service payments</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends 'admin/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Booking Payments - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Booking Payments</h1>
+        <div class="d-none d-sm-inline-block">
+            <a href="{% url 'admin_payments' %}" class="btn btn-sm btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-6">
+                    <label for="status" class="form-label">Filter by Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="failed" {% if status_filter == 'failed' %}selected{% endif %}>Failed</option>
+                        <option value="refunded" {% if status_filter == 'refunded' %}selected{% endif %}>Refunded</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="search" class="form-label">Search</label>
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="Search by reference, guest name..." value="{{ search_query }}">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">All Booking Payments</h6>
+        </div>
+        <div class="card-body">
+            {% if payments %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Booking Reference</th>
+                            <th>Guest</th>
+                            <th>Room</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr>
+                            <td>
+                                <strong>{{ payment.booking.booking_reference }}</strong>
+                            </td>
+                            <td>{{ payment.booking.guest_name }}</td>
+                            <td>{{ payment.booking.room.room_type.name }}</td>
+                            <td>GHS {{ payment.amount_paid }}</td>
+                            <td>{{ payment.get_payment_method_display }}</td>
+                            <td>
+                                <span class="badge badge-{% if payment.payment_status == 'completed' %}success{% elif payment.payment_status == 'pending' %}warning{% else %}danger{% endif %}">
+                                    {{ payment.get_payment_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                            <td>
+                                <a href="{% url 'edit_booking_payment' payment.id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'receive_booking_payment' payment.booking.booking_reference %}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-money-bill"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Booking Payments Found</h4>
+                <p class="text-muted">No booking payments match your search criteria.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
